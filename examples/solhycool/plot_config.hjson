@@ -1,0 +1,543 @@
+{
+  # General plot attributes
+  title: "Hierarchical control",
+  subtitle: "Experimental results",
+  height: 1400,
+  width: 1000,
+  margin: {
+    l:20,
+    r:200,
+    t:100,
+    b:20,
+    pad:5
+  },
+  vertical_spacing: 0.03,
+  xdomain: [0, 0.85],
+  arrow_xrel_pos: 60, # seconds
+  show_optimization_updates: false,
+
+  # Legend(s) attributes
+  legend: {
+    "legend": {
+        "title": "Optimization layer",
+        "bgcolor": "bg_blue_rgb",
+        "x": 0.9,
+        "y": 0.7,
+    },
+    "legend2": {
+        "title": "Control layer",
+        "bgcolor": "bg_gray_rgb",
+        "x": 0.9,
+        "y": 0.55,
+    },
+  }
+
+  # Individual plot attributes
+  # First specify the plot attributes
+  # In traces, specify the variables to be plotted, the definition order controls the order of the traces in the plot
+  plots: {
+    environment: {
+      title: "Environment",
+      row_height: 1,
+      bg_color: "steelblue",
+      ylabels_left: ["T<sub>amb</sub> (ºC)"],
+      ylabels_right: ["ɸ (%)"], # As many as n_yaxis-1
+
+      traces_left: [
+        {
+          var_id: "Tamb_opt",
+          name: "model value", # "T<sub>amb,opt</sub>",
+          mode: "lines",
+          color: "plotly_blue",
+          width: 0.5,
+          dash: "dashdot", # "dot", "dash", "dashdot"
+          showlegend: true,
+          legend: 'legend'
+        },
+        {
+          var_id: "Tamb",
+          name: "experimental value", # "T<sub>amb,ts</sub>",
+          mode: "lines",
+          color: "plotly_blue", # plotly blue
+          showlegend: true,
+          legend: 'legend',
+          axis_arrow: true,
+          arrow_yrel_pos: 1.05,
+          "instrument": "pt1000"
+        },
+      ],
+
+      traces_right: [
+        {
+          var_id: "HR_opt",
+          name: "ɸ<sub>opt</sub>",
+          mode: "lines",
+          color: "plotly_green", # gray
+          width: 0.5,
+          dash: "dashdot", # "dot", "dash", "dashdot"
+          showlegend: false
+        },
+        {
+          var_id: "HR",
+          name: "ɸ<sub>ts</sub>",
+          mode: "lines",
+          color: "plotly_green", # plotly green
+          showlegend: false,
+          axis_arrow: true,
+          arrow_yrel_pos: 0.9,
+          "instrument": "humidity_capacitive"
+        },
+      ]
+    },
+
+    cooling_requirements: {
+      title: "Cooling requirements",
+      row_height: 1,
+      bg_color: "steelblue",
+      ylabels_left: ["T<sub>v</sub> (ºC)"],
+      ylabels_right: ["P<sub>th</sub> (kW<sub>th</sub>)"], # As many as n_yaxis-1
+
+      traces_left: [
+        #{
+        #  var_id: "Tv_opt",
+        #  name: "T<sub>v,opt</sub>",
+        #  mode: "lines",
+        #  color: "plotly_red",
+        #  width: 0.5,
+        #  dash: "dashdot", # "dot", "dash", "dashdot"
+        #  showlegend: false
+        #},
+        {
+          var_id: "Tv",
+          name: "T<sub>v,ts</sub>",
+          mode: "lines",
+          color: "plotly_red", # plotly blue
+          showlegend: false,
+          axis_arrow: true,
+          arrow_yrel_pos: 0.99,
+          "instrument": "pt100"
+        },
+      ],
+
+      traces_right: [
+        {
+          var_id: "Pth_opt", # TODO: Change to Pth, needs to be calculated beforehand
+          name: "P<sub>th,opt</sub>",
+          mode: "lines",
+          color: "plotly_cyan", # gray
+          width: 0.5,
+          dash: "dashdot", # "dot", "dash", "dashdot"
+          showlegend: false
+        },
+        {
+          var_id: "Pth", # TODO: Change to Pth, needs to be calculated beforehand
+          name: "P<sub>th,ts</sub>",
+          mode: "lines",
+          color: "plotly_cyan",
+          showlegend: false,
+          axis_arrow: true,
+          arrow_yrel_pos: 0.95,
+        },
+        {
+          var_id: "Mv_kgh", # TODO: Change to Pth, needs to be calculated beforehand
+          name: "m<sub>v</sub>",
+          mode: "lines",
+          color: "plotly_red",
+          showlegend: false,
+          axis_arrow: true,
+          arrow_yrel_pos: 0.95,
+        },
+      ]
+    },
+
+    costs: {
+      title: "Costs",
+      row_height: 1,
+      bg_color: "steelblue",
+      # ylabels_left: ["C (u.m.)"],
+      # ylabels_right: ["C<sub>e</sub> (kW<sub>e</sub>)", "C<sub>w</sub> (<sub>L/h</sub>)"], # As many as n_yaxis-1
+      ylabels_left: ["C<sub>e</sub> (kW<sub>e</sub>)"],
+      ylabels_right: ["C<sub>w</sub> (L/h)"],
+
+      traces_left:
+      #[
+      #  {
+      #    name: "C",
+      #    mode: "lines",
+      #    color: "plotly_blue",
+      #    var_id: "C_opt",
+      #    showlegend: false,
+      #    axis_arrow: true,
+      #    arrow_yrel_pos: 1.05
+      #  }
+      #],
+      [
+          {
+            var_id: "Ce_opt",
+            name: "C<sub>e,opt</sub>",
+            mode: "lines",
+            color: "gray", # green DC
+            width: 0.5,
+            dash: "dashdot", # "dot", "dash", "dashdot"
+            showlegend: false,
+          },
+          {
+            var_id: "Ce",
+            name: "C<sub>e,ts</sub>",
+            mode: "lines",
+            color: "dc_green", # gray
+            showlegend: false,
+            axis_arrow: true,
+            arrow_yrel_pos: 0.95
+          },
+        ],
+
+      traces_right: [
+      #  [ # First yaxis
+      #    {
+      #      var_id: "Ce_opt",
+      #      name: "C<sub>e,opt</sub>",
+      #      mode: "lines",
+      #      color: "gray", # green DC
+      #      width: 0.5,
+      #      dash: "dashdot", # "dot", "dash", "dashdot"
+      #      showlegend: false,
+      #    },
+      #    {
+      #      var_id: "Ce",
+      #      name: "C<sub>e,ts</sub>",
+      #      mode: "lines",
+      #      color: "dc_green", # gray
+      #      showlegend: false,
+      #      axis_arrow: true,
+      #      arrow_yrel_pos: 0.95
+      #    },
+      #  ],
+        [  # Second yaxis
+          {
+            var_id: "Cw_opt",
+            name: "C<sub>w,opt</sub>",
+            mode: "lines",
+            color: "gray", # purple WCT
+            width: 0.5,
+            dash: "dashdot", # "dot", "dash", "dashdot"
+            showlegend: false,
+          },
+          {
+            var_id: "Cw", # TODO: Change to Cw, needs to be added to the registry first
+            name: "C<sub>w,ts</sub>",
+            mode: "lines",
+            color: "wct_purple", # gray
+            showlegend: false,
+            axis_arrow: true,
+            arrow_yrel_pos: 0.95,
+            "instrument": "paddle_wheel_flow_meter"
+          },
+        ]
+      ]
+    },
+
+    temperatures_dc_cv: {
+      title: "DC outlet temperature loop",
+      row_height: 0.33,
+      bg_color: "bg_gray", # bg gray
+      ylabels_left: ["ω<sub>dc</sub> (%)"],
+
+      # Plotted between this plot and the next one
+      show_active: false,
+      active_var_id: "dc_active",
+      active_color: "dc_green_rgb", # Needs to end with _rgb
+
+      tigth_vertical_spacing: true, # Reduce vertical spacing between this plot and the next one
+
+      traces_left: [
+        {
+          var_id: "w_dc_opt",
+          name: "ω<sub>dc,opt</sub>",
+          mode: "lines",
+          color: "dc_green", # gray
+          width: 0.5,
+          dash: "dashdot", # "dot", "dash", "dashdot"
+          showlegend: false
+        },
+        {
+          var_id: "w_dc",
+          name: "ω<sub>dc,ts</sub>",
+          mode: "lines",
+          color: "dc_green", # green DC
+          showlegend: false
+        },
+      ]
+    },
+
+    temperatures_dc: {
+      row_height: 1,
+      bg_color: "bg_gray", # bg gray
+      ylabels_left: ["Temperature <br>(ºC)</br>"],
+      # ylabels_left: ["T<sub>dc</sub> (ºC)"],
+
+      traces_left: [
+        {
+          var_id: "Tdc_in_opt",
+          name: "disturbance (model)", # T<sub>dc,in,opt</sub>
+          mode: "lines",
+          color: "gray", # gray
+          width: 0.5,
+          dash: "dashdot", # "dot", "dash", "dashdot"
+          showlegend: true,
+          legend: 'legend2'
+        },
+        {
+          var_id: "Tdc_in",
+          name: "disturbance (experimental)", # T<sub>dc,in,ts</sub>
+          mode: "lines",
+          color: "gray", # gray
+          width: 0.5,
+          showlegend: true,
+          legend: 'legend2',
+          "instrument": "pt100"
+        },
+        {
+          var_id: "Tdc_out",
+          name: "controlled / measured variable", # "T<sub>dc,out</sub>",
+          mode: "lines",
+          color: "dc_green", # green DC
+          showlegend: true,
+          legend: 'legend2',
+          "instrument": "pt100"
+        },
+        {
+          var_id: "Tdc_out_sp",
+          name: "setpoint", # "T<sub>dc,sp</sub>",
+          mode: "lines",
+          color: "dc_green", # green DC
+          width: 4,
+          dash: "dash", # "dot", "dash", "dashdot"
+          showlegend: true,
+          legend: 'legend2',
+        },
+      ]
+    },
+
+    flows_dc_cv: {
+      title: "DC flow loop",
+      row_height: 0.3,
+      bg_color: "bg_gray", # bg gray
+      ylabels_left: ["V<sub>2</sub> (%)"],
+      tigth_vertical_spacing: true, # Reduce vertical spacing between this plot and the next one
+
+      traces_left: [
+        {
+          var_id: "v1",
+          name: "v<sub>1,ts</sub>",
+          mode: "lines",
+          color: "dc_green", # purple WCT
+          showlegend: false
+        },
+      ]
+    },
+
+    flows_dc: {
+      row_height: 0.6,
+      bg_color: "bg_gray", # bg gray
+      ylabels_left: ["q<sub>dc</sub> (m³/h)"],
+
+      traces_left: [
+        {
+          var_id: "q_dc",
+          name: "q<sub>dc</sub>",
+          mode: "lines",
+          color: "dc_green",
+          showlegend: false,
+          "instrument": "vortex_flow_meter"
+        },
+        {
+          var_id: "q_dc_sp",
+          name: "q<sub>dc,sp</sub>",
+          mode: "lines",
+          color: "dc_green",
+          width: 4,
+          dash: "dash", # "dot", "dash", "dashdot"
+          showlegend: false
+        },
+      ]
+    },
+
+    temperatures_wct_cv: {
+      title: "WCT outlet temperature loop",
+      row_height: 0.33,
+      bg_color: "bg_gray", # bg gray
+      ylabels_left: ["ω<sub>wct</sub> (%)"],
+
+      # Plotted between this plot and the next one
+      show_active: false,
+      active_var_id: "wct_active",
+      active_color: "wct_purple_rgb", # Needs to end with _rgb
+
+      tigth_vertical_spacing: true, # Reduce vertical spacing between this plot and the next one
+
+      traces_left: [
+        {
+          var_id: "w_wct_opt",
+          name: "ω<sub>wct,opt</sub>",
+          mode: "lines",
+          color: "wct_purple", # gray
+          width: 0.5,
+          dash: "dashdot", # "dot", "dash", "dashdot"
+          showlegend: false
+        },
+        {
+          var_id: "w_wct",
+          name: "ω<sub>wct,ts</sub>",
+          mode: "lines",
+          color: "wct_purple", # purple WCT
+          showlegend: false
+        },
+      ]
+    },
+
+    temperatures_wct: {
+      row_height: 1,
+      bg_color: "bg_gray", # bg gray
+      # ylabels_left: ["T<sub>wct</sub> (ºC)"],
+      ylabels_left: ["Temperature <br>(ºC)</br>"],
+
+      traces_left: [
+        {
+          var_id: "Twct_in_opt",
+          name: "T<sub>wct,in,opt</sub>",
+          mode: "lines",
+          color: "gray", # gray
+          width: 0.5,
+          dash: "dashdot", # "dot", "dash", "dashdot"
+          showlegend: false
+        },
+        {
+          var_id: "Twct_in",
+          name: "T<sub>wct,in,ts</sub>",
+          mode: "lines",
+          color: "gray", # gray
+          width: 0.5,
+          showlegend: false,
+          "instrument": "pt100"
+        },
+        {
+          var_id: "Twct_out",
+          name: "T<sub>wct,out</sub>",
+          mode: "lines",
+          color: "wct_purple",
+          showlegend: false,
+          "instrument": "pt100"
+        },
+        {
+          var_id: "Twct_out_sp",
+          name: "T<sub>wct,sp</sub>",
+          mode: "lines",
+          color: "wct_purple",
+          width: 4,
+          dash: "dash", # "dot", "dash", "dashdot"
+          showlegend: false
+        },
+      ]
+    },
+
+
+    flows_vm_cv: {
+      title: "WCT flow (series component) loop",
+      row_height: 0.3,
+      bg_color: "bg_gray", # bg gray
+      ylabels_left: ["V<sub>1</sub> (%)"],
+      tigth_vertical_spacing: true, # Reduce vertical spacing between this plot and the next one
+
+      traces_left: [
+        {
+          var_id: "v2",
+          name: "v<sub>2,ts</sub>",
+          mode: "lines",
+          color: "wct_purple",
+          showlegend: false
+        },
+      ]
+    },
+
+    flows_vm: {
+      row_height: 0.6,
+      bg_color: "bg_gray", # bg gray
+      ylabels_left: ["q<sub>vm</sub> (m³/h)"],
+
+      traces_left: [
+        {
+          var_id: "q_vm",
+          name: "q<sub>vm</sub>",
+          mode: "lines",
+          color: "wct_purple",
+          showlegend: false,
+          "instrument": "vortex_flow_meter"
+        },
+        {
+          var_id: "q_vm_sp",
+          name: "q<sub>vm,sp</sub>",
+          mode: "lines",
+          color: "wct_purple",
+          width: 4,
+          dash: "dash", # "dot", "dash", "dashdot"
+          showlegend: false
+        },
+      ]
+    }
+
+    flows_c_cv: {
+      title: "Flow - Condenser",
+      row_height: 0.3,
+      bg_color: "bg_gray", # bg gray
+      ylabels_left: ["ω<sub>c</sub> (%)"],
+      tigth_vertical_spacing: true, # Reduce vertical spacing between this plot and the next one
+
+      traces_left: [
+        {
+          var_id: "w_c",
+          name: "ω<sub>c,ts</sub>",
+          mode: "lines",
+          color: "c_blue",
+          showlegend: false
+        },
+      ]
+    },
+
+    flows_c: {
+      row_height: 0.6,
+      bg_color: "bg_gray", # bg gray
+      ylabels_left: ["q<sub>c</sub> (m³/h)"],
+
+      traces_left: [
+        {
+          var_id: "q_c",
+          name: "q<sub>c</sub>",
+          mode: "lines",
+          color: "c_blue",
+          showlegend: false,
+          "instrument": "vortex_flow_meter"
+        },
+        {
+          var_id: "qc_sp",
+          name: "q<sub>c,sp</sub>",
+          mode: "lines",
+          color: "c_blue",
+          width: 4,
+          dash: "dash", # "dot", "dash", "dashdot"
+          showlegend: false
+        },
+       # {
+       #   var_id: "q_c_opt",
+       #   name: "q<sub>c,sp</sub>",
+       #   mode: "lines",
+       #   color: "c_blue",
+       #   width: 2,
+       #   dash: "dash", # "dot", "dash", "dashdot"
+       #   showlegend: false
+       # },
+      ]
+    }
+
+  }
+}
