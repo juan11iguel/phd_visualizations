@@ -1,12 +1,17 @@
 from pathlib import Path
-import numpy as np
-import pandas as pd
+# import numpy as np
+# import pandas as pd
 import plotly.graph_objects as go
-from typing import List, Literal
+import typing
 from loguru import logger
 from .constants import color_palette, plt_colors, default_fontsize, newshape_style
 
-def save_figure(fig: go.Figure, figure_name: str, figure_path: str | Path, formats: List[Literal['eps', 'png', 'svg']],
+Argument = typing.Literal['eps', 'png', 'svg', 'html']
+VALID_FIGURE_FORMATS: typing.Tuple[Argument, ...] = typing.get_args(Argument)
+
+
+def save_figure(fig: go.Figure, figure_name: str, figure_path: str | Path,
+                formats: VALID_FIGURE_FORMATS,
                 width=600, height=800, scale=2) -> None:
 
     """ Save figures in different formats """

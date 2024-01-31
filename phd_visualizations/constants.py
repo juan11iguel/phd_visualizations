@@ -14,6 +14,7 @@ color_palette = {
     "plotly_red": "#EF553B", "plotly_red_rgb": "239, 85, 59",
     "plotly_cyan": "#19D3F3", "plotly_cyan_rgb": "25, 211, 243",
     "plotly_yellow": "#FECB52", "plotly_yellow_rgb": "254, 203, 82",
+    "plotly_orange": "#FFA15A", "plotly_orange_rgb": "255, 161, 90",
     "dc_green": "#83b366", "dc_green_rgb": "131, 179, 102",
     "wct_purple": "#9573a6", "wct_purple_rgb": "149, 115, 166",
     "c_blue": "#6c8ebf", "c_blue_rgb": "108, 142, 191",
