@@ -1,9 +1,14 @@
+import numpy as np
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from typing import Literal
+from collections import OrderedDict
 
 # Colors definition
-color_palette = {
+color_palette = OrderedDict({
+    "cool_red": "#E77C8D", "cool_red_rgb": "231, 124, 141",
+    "cool_green":  "#5AA9A2", "cool_green_rgb": "90, 169, 162",
     "bg_gray": "#B6B6B6", "bg_gray_rgb": "182, 182, 182",
     "bg_blue": "steelblue", "bg_blue_rgb": "70, 130, 180",
     "bg_orange": "#e66100", "bg_orange_rgb": "230, 97, 0",
@@ -19,10 +24,11 @@ color_palette = {
     "wct_purple": "#9573a6", "wct_purple_rgb": "149, 115, 166",
     "c_blue": "#6c8ebf", "c_blue_rgb": "108, 142, 191",
     "turquesa": "#00A08B", "turquesa_rgb": "0, 160, 139",
-}
+})
 
 default_fontsize = 16
 plt_colors = px.colors.qualitative.Plotly * 3 # * 3 to have plenty of colors
+ArrayLike = np.ndarray | list | pd.DataFrame | pd.Series
 
 # style of user-drawn shapes
 newshape_style: dict = dict(

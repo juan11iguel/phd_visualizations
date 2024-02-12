@@ -10,20 +10,24 @@ Argument = typing.Literal['eps', 'png', 'svg', 'html']
 VALID_FIGURE_FORMATS: typing.Tuple[Argument, ...] = typing.get_args(Argument)
 
 
-def save_figure(fig: go.Figure, figure_name: str, figure_path: str | Path,
+def save_figure(fig: go.Figure, figure_name: str, figure_path: str | Path | list,
                 formats: VALID_FIGURE_FORMATS,
                 width=600, height=800, scale=2) -> None:
 
     """ Save figures in different formats """
 
-    for fmt in formats:
-        if fmt not in ['eps', 'png', 'svg', 'html']:
-            raise ValueError(f'Format {fmt} not supported')
+    if not isinstance(figure_path, list):
+        figure_path = [figure_path]
 
-        if fmt == 'html':
-            fig.write_html(f'{figure_path}/{figure_name}.{fmt}', include_plotlyjs='cdn', full_html=False)
-        else:
-            fig.write_image(f'{figure_path}/{figure_name}.{fmt}', format=fmt, width=width, height=height, scale=scale)
-            # plt.savefig(f'{figure_path}/{figure_name}.{fmt}', format=fmt)
+    for path in figure_path:
+        for fmt in formats:
+            if fmt not in ['eps', 'png', 'svg', 'html']:
+                raise ValueError(f'Format {fmt} not supported')
 
-        logger.info(f'Figure saved in {figure_path}/{figure_name}.{fmt}')
+            if fmt == 'html':
+                fig.write_html(f'{path}/{figure_name}.{fmt}', include_plotlyjs='cdn', full_html=False)
+            else:
+                fig.write_image(f'{path}/{figure_name}.{fmt}', format=fmt, width=width, height=height, scale=scale)
+                # plt.savefig(f'{path}/{figure_name}.{fmt}', format=fmt)
+
+            logger.info(f'Figure saved in {figure_path}/{figure_name}.{fmt}')

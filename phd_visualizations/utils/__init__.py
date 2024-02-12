@@ -19,6 +19,9 @@ def rename_signal_ids_to_var_ids(df: pd.DataFrame, vars_config: dict) -> pd.Data
     duplicates = {}
 
     for var_info in vars_config.values():
+        if 'signal_id' not in var_info:
+            logger.warning(f"Signal id not found in variable {var_info['var_id']}, skipping")
+            continue
         signal_id = var_info['signal_id']
         var_id = var_info['var_id']
 

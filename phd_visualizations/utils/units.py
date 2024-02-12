@@ -45,6 +45,7 @@ unit_mapping = {
         "MPa": ["MPa", "mpa"],
         "bar": ["bar", "BAR"],
         "Pa":  ["Pa", "pa"],
+        "mbar": ["mbar", "MBAR", "mBar"],
     },
     "mass_flows":{
         "kgs": ["kg/s", "kgs"],
@@ -52,7 +53,7 @@ unit_mapping = {
     },
     "volumetric_flows":{
         "Ls": ["L/s", "Ls", "ls"],
-        "Lmin": ["L/min", "Lmin", "lmin"],
+        "Lmin": ["L/min", "Lmin", "lmin", "LMIN"],
         "m3h": ["m³/h", "m3h", "m3/h"],
     },
     "concentrations":{
@@ -61,7 +62,7 @@ unit_mapping = {
         "gkg": ["g/kg", "gkg"],
     },
     "powers":{
-        "kW": ["kW", "kw"],
+        "kW": ["kW", "kw", "KW"],
         "W": ["W", "w"],
     },
     "conductivities":{
@@ -97,7 +98,7 @@ def find_symbol(symbol: str) -> str:
                 return unit_id
 
     else:
-        raise ValueError(f"Unknown unit symbol {symbol}, must be one of {unit_mapping}")
+         raise ValueError(f"Unknown unit symbol {symbol}, must be one of {unit_mapping}")
 
 
 def to_K(T: ArrayLike, unit:Literal[supported_temperature_units]) -> ArrayLike:
@@ -128,6 +129,8 @@ def to_MPa(P: ArrayLike, unit:Literal[supported_pressure_units]) -> ArrayLike:
         return P
     elif unit == "Pa":
         return P * 1e-6
+    elif unit == "mbar":
+        return P * 1e-3
     else:
         raise ValueError(f"Unknown pressure unit {unit}, must be one of {supported_pressure_units}")
 
@@ -140,6 +143,8 @@ def MPa_to(P: ArrayLike, unit:Literal[supported_pressure_units]) -> ArrayLike:
         return P
     elif unit == "Pa":
         return P * 1e6
+    elif unit == "mbar":
+        return P * 1e3
     else:
         raise ValueError(f"Unknown pressure unit {unit}, must be one of {supported_pressure_units}")
 
@@ -167,6 +172,9 @@ def kW_to(P: ArrayLike, unit:Literal[supported_power_units]) -> ArrayLike:
 def to_kgs(q: ArrayLike, unit:Literal[supported_mass_flow_units+supported_volumetric_flow_units],
            P_MPa: ArrayLike = None, T_K: ArrayLike = None) -> ArrayLike:
 
+    def calculate_m(row):
+        return row['q'] * w_props(T=row['T_K'], P=row['P_MPa']).rho / 3600 # m³/h * rho [kg/m³] / 3600 [s/h] = kg/s
+
     if unit == "kgh":
         return q / 3600
     elif unit == "kgs":
@@ -176,7 +184,11 @@ def to_kgs(q: ArrayLike, unit:Literal[supported_mass_flow_units+supported_volume
         if P_MPa is None or T_K is None:
             raise ValueError("Pressure (MPa) and temperature (K) must be provided to convert volumetric flow to mass flow")
         else:
-            return q * w_props(T=T_K, P=P_MPa).rho * 3600 # m³/h * rho [kg/m³] * 3600 [s/h] = kg/s
+            # Bazofia del año?
+            temp_df = pd.DataFrame({'q': q, 'P_MPa': P_MPa, 'T_K': T_K})
+            m = temp_df.apply(calculate_m, axis=1)
+
+            return m
     else:
         raise ValueError(f"Unknown mass flow unit {unit}, must be one of {supported_mass_flow_units}")
 
@@ -201,18 +213,25 @@ def kgs_to(m: ArrayLike, unit:Literal[supported_mass_flow_units+supported_volume
 def to_m3h(q: ArrayLike, unit:Literal[supported_volumetric_flow_units + supported_mass_flow_units],
            P_MPa: ArrayLike = None, T_K: ArrayLike = None) -> ArrayLike:
 
+    def calculate_q(row):
+        return row['m'] / w_props(T=row['T_K'], P=row['P_MPa']).rho * 3600 # kg/s * 1/rho [kg/m³] * 3600 [s/h] = m³/h
+
     if unit == "m3h":
         return q
     elif unit == "Ls":
         return q * 3.6
     elif unit == "Lmin":
-        return q * 60
+        return q / 60
     elif unit in supported_mass_flow_units:
         if P_MPa is None or T_K is None:
             raise ValueError("Pressure (MPa) and temperature (K) must be provided to convert mass flow to volumetric flow")
         else:
             m = to_kgs(q, unit, P_MPa=P_MPa, T_K=T_K) # kg/s
-            return m / w_props(T=T_K, P=P_MPa).rho * 3600 # kg/s * 1/rho [kg/m³] * 3600 [s/h] = m³/h
+            # Bazofia del año?
+            temp_df = pd.DataFrame({'m': m, 'P_MPa': P_MPa, 'T_K': T_K})
+            q = temp_df.apply(calculate_q, axis=1)
+
+            return q
     else:
         raise ValueError(f"Unknown volumetric flow unit {unit}, must be one of {supported_volumetric_flow_units}")
 
@@ -225,7 +244,7 @@ def m3h_to(q: ArrayLike, unit:Literal[supported_volumetric_flow_units + supporte
     elif unit == "Ls":
         return q / 3.6
     elif unit == "Lmin":
-        return q / 60
+        return q * 60
     elif unit in supported_mass_flow_units:
         if P is None or T is None:
             raise ValueError("Pressure (MPa) and temperature (K) must be provided to convert mass flow to volumetric flow")
@@ -235,6 +254,10 @@ def m3h_to(q: ArrayLike, unit:Literal[supported_volumetric_flow_units + supporte
     else:
         raise ValueError(f"Unknown volumetric flow unit {unit}, must be one of {supported_volumetric_flow_units}")
 
+# TODO: Redo as with flows, when converting from concentration to conductivity, first convert to the common cateogry
+#  unit and then do the conversion to the desired unit, and viceversa.
+
+# TODO: For conductivity, the common unit should be one supported by conductivity_to_mass_fraction
 
 def to_kgkg(w: ArrayLike, unit:Literal[supported_concentration_units + supported_conductivity_units]) -> ArrayLike:
 
@@ -292,11 +315,11 @@ def Sm_to(w: ArrayLike, unit:Literal[supported_conductivity_units]) -> ArrayLike
         raise ValueError(f"Unknown conductivity unit {unit}, must be one of {supported_conductivity_units}")
 
 
-@logger.catch
 def unit_conversion(
         df: pd.DataFrame, signals_config: dict,
         input_unit_key: str = "unit", output_unit_key: str = "unit_model",
-        update_mode: Literal["replace", "rename_input_unit", "rename_output_unit", "rename_both"] = "replace"
+        update_mode: Literal["replace", "rename_input_unit", "rename_output_unit", "rename_both"] = "replace",
+        skip_unknown_symbols:bool = False
 ) -> pd.DataFrame:
 
     """
@@ -356,10 +379,20 @@ def unit_conversion(
                 f"Signal {var_id} does not have {input_unit_key} or {output_unit_key} specified in signals_config. Skipping unit conversion."
             )
         else:
-            var_ids.append(var_id)
-            # Convert signals_config[var_id][input_unit_id] based on unit_mapping
-            input_units.append( find_symbol(signals_config[var_id][input_unit_key]) )
-            output_units.append( find_symbol(signals_config[var_id][output_unit_key]) )
+            try:
+                # Convert signals_config[var_id][input_unit_id] based on unit_mapping
+                input_units.append( find_symbol(signals_config[var_id][input_unit_key]) )
+                output_units.append( find_symbol(signals_config[var_id][output_unit_key]) )
+                var_ids.append(var_id) # At the end, so if an exception is raised before, the list is not updated
+            except ValueError as e:
+                if skip_unknown_symbols:
+                    logger.warning(f"Skipping unknown symbols in signals_config, {var_id}: {signals_config[var_id].get(input_unit_key, None)} -> {signals_config[var_id].get(output_unit_key, None)}")
+
+                    # Make sure that input_unit is not added if output_unit is not recognised
+                    if len(input_units) > len(output_units):
+                        input_units.pop(-1)
+                else:
+                    raise e
 
             # units.append(signals_config[var_id][input_unit_id])
 
@@ -457,6 +490,8 @@ def unit_conversion(
                     T_aux = np.ones(len(df)) * 25 + 273.15
                     logger.warning(
                         f'Could not find any variable matching T{var_id[1:]}*_K in available variables. Using default value of {T_aux[0]} K')
+
+                pd.isnull(T_aux).sum()
 
                 if input_unit in supported_mass_flow_units:
                     if output_unit in supported_mass_flow_units:

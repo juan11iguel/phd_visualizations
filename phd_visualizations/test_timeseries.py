@@ -1,13 +1,9 @@
-# TODO: Add legend for control layer (setpoint, output, disturbance)
-# TODO: Filter out unreasonable values for consumptions (Ce and Cw)
-# TODO: If a system is inactive, its control signal must go to zero, add representation of state with filled areas, ON: color of the system, OFF: gray
 
 # TODO: Plotly resampler, resampling does not work whenever the is more than one plot, works with multiple legends,
 #  and multiple yaxes, must have something to do with the way axis are configured
 # TODO: Uncertainty bounds not showing after last changes, used to work before (see figure from PID2024 article)
-
-# TODO: Take variable name from plot_config -> variables_config.label_html -> var_id
 # TODO: Take instrument from plot_config -> variables_config
+# TODO: Parameter to configure limits either: 'auto', 'manual' (calculated from min max of traces in axes), [min, max]
 
 import pandas as pd
 import numpy as np
@@ -16,15 +12,16 @@ from typing import Literal
 import plotly
 import plotly.graph_objects as go
 from loguru import logger
-from .constants import color_palette, default_fontsize, newshape_style
+from .constants import color_palette, default_fontsize, newshape_style, ArrayLike
 from .calculations import calculate_uncertainty
 from plotly_resampler import FigureResampler
 
 legends_plotly_ids = {}
 
 def add_trace(fig: go.Figure | FigureResampler, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int, xaxes_idx: int,
-              resample: bool, show_arrow: bool, trace_color: str, uncertainty: bool = False, row_idx: int = None,
-              axis_side:Literal['left', 'right'] = 'left', arrow_xrel_pos:int = None, var_config:dict = None) -> go.Figure | FigureResampler:
+              resample: bool, show_arrow: bool = False, trace_color: str = None, uncertainty: ArrayLike = None, row_idx: int = None,
+              axis_side:Literal['left', 'right'] = 'left', arrow_xrel_pos:int = None, var_config:dict = None,
+              df_comp: pd.DataFrame = None) -> go.Figure | FigureResampler:
 
 
     """ Add custom trace to plotly figure, it can include:
@@ -34,7 +31,11 @@ def add_trace(fig: go.Figure | FigureResampler, trace_conf: dict, df: pd.DataFra
 
     """
     var_config = var_config if var_config is not None else {}
-    color = color_palette[trace_color] if trace_color in color_palette.keys() else trace_color
+
+    if trace_color is not None:
+        color = color_palette[trace_color] if trace_color in color_palette.keys() else trace_color
+    else:
+        color = None
 
     legend_id = trace_conf.get('legend_id', None)
 
@@ -52,7 +53,7 @@ def add_trace(fig: go.Figure | FigureResampler, trace_conf: dict, df: pd.DataFra
     if name is None:
         name = var_config.get('label_html', None)
     if name is None:
-        name = var_config.get('var_id', None)
+        name = var_config['var_id']
 
     if showlegend:
         logger.debug(f'legend_id: {legend_id}, legend: {legend} for trace {name}')
@@ -90,6 +91,7 @@ def add_trace(fig: go.Figure | FigureResampler, trace_conf: dict, df: pd.DataFra
 
     # Add trace
     plotly_resample_kwargs = {'hf_x': df.index, 'hf_y': df[trace_conf['var_id']]} if resample else {}
+    plotly_resample_kwargs_comp = {'hf_x': df_comp.index, 'hf_y': df_comp[trace_conf['var_id']]} if (resample and df_comp is not None) else {}
 
     fig.add_trace(
         go.Scattergl(
@@ -105,14 +107,40 @@ def add_trace(fig: go.Figure | FigureResampler, trace_conf: dict, df: pd.DataFra
             showlegend=showlegend,
             legend=legend,
             xaxis=f'x{xaxes_idx}',
-            yaxis=f'y{yaxes_idx}'
+            yaxis=f'y{yaxes_idx}',
+
+            # Add customdata to show comparison values if provided
+            customdata=df_comp[trace_conf['var_id']] if df_comp is not None else None,
+            hovertemplate = "%{y:.2f}" if df_comp is None else "%{y:.2f} (<span style='color:gray'> %{customdata:.2f} </span>)"
         ),
         **plotly_resample_kwargs
     )
 
+    # If comparison dataframe is given, add comparison trace
+    if df_comp is not None:
+        fig.add_trace(
+            go.Scattergl(
+                x=df_comp.index if not resample else None,
+                y=df_comp[trace_conf['var_id']] if not resample else None,
+                name=f"{name} comparison",
+                mode='lines',
+                line=dict(
+                    color='gray',
+                    dash='dash',
+                    width=1
+                ),
+                showlegend=False,
+                xaxis=f'x{xaxes_idx}',
+                yaxis=f'y{yaxes_idx}',
+                # Hide tooltip
+                hoverinfo='skip'
+            ),
+            **plotly_resample_kwargs_comp
+        )
+
     logger.info(
         f'Trace {name} added in yaxis{yaxes_idx} ({axis_side}), row {row_idx + 1}, uncertainty: '
-        f'{True if uncertainty is not None else False}'
+        f'{True if uncertainty is not None else False}, comparison: {True if df_comp is not None else False}'
     )
 
     # If right axis traces and specified in trace configuration, add arrow to indicate axis
@@ -136,9 +164,15 @@ def add_trace(fig: go.Figure | FigureResampler, trace_conf: dict, df: pd.DataFra
     return fig
 
 def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.DataFrame | None = None,
+                              df_comp: pd.DataFrame | None = None, title_text: str = None,
                               resample: bool = True, vars_config: dict = None) -> go.Figure:
 
-    """ Generate plotly figure with experimental results """
+    """ Generate plotly figure with experimental results
+
+    # TODO: If df_comp is given, duplicate each trace from plt_config with a gray color and a dashed line,
+    # and tune the tooltip to show the original and the comparison value
+
+    """
 
     if resample:
         fig = FigureResampler(go.Figure(), )
@@ -223,6 +257,44 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
     yaxes_settings = {}
     # yaxes_settings['yaxis'] = {'domain': domains(1)}
 
+    # Prepare vertical highlights
+    vert_values = None
+    if 'vertical_highlights' in plt_config.keys():
+        # If vertical highlights are specified in plot configuration
+        vert_conf = plt_config['vertical_highlights']
+        if vert_conf is not None:
+            highlight_type = vert_conf.get('type', "normal_trace")
+            if highlight_type == "normal_trace":
+                if 'var_id' in vert_conf.keys():
+                    if vert_conf['var_id'] in df.columns:
+                        vert_values = df[vert_conf['var_id']]
+                    else:
+                        raise ValueError(
+                            f'var_id `{vert_conf["var_id"]}` not found in dataframe')
+                else:
+                    raise ValueError('var_id must be specified in plot configuration if vertical_highlights are enabled')
+
+                ### Color
+                if 'color' in vert_conf.keys():
+                    if vert_conf['color'] in color_palette.keys():
+                        vert_color = color_palette[vert_conf['color']]
+                    else:
+                        logger.warning(f'Color {conf["active_color"]} not found in color_palette, using default color')
+                        vert_color = color_palette['plotly_yellow']
+
+                else:
+                    vert_color = color_palette['plotly_yellow']
+
+                ### Calculate times when the system changes state
+                change_times_vert = vert_values.index[vert_values.diff() != 0]
+                change_times_vert = change_times_vert.insert(len(change_times_vert), vert_values.index[-1])
+
+                ### Make change_times index of vert_values
+                vert_values = vert_values.reindex(change_times_vert, method='ffill')
+            else:
+                raise ValueError(f'highlight_type {highlight_type} not supported')
+
+
     shapes = []
     idx = 1
     for row_idx, plot_id in zip(range(rows), plt_config['plots'].keys()):
@@ -279,6 +351,29 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                         y0=-0.01, y1=1.01,
                     ),
                 )
+
+        ## Add vertical highlights
+        if vert_values is not None and conf.get('show_vertical_highlights', True):
+            # If vertical highlights are specified in plot configuration, and not explicitly disabled in plot configuration
+
+            ### Add traces for every state change
+            for i_act in range(1, len(vert_values)):
+                value = vert_values.iloc[i_act - 1]  # The value of the current span is the previous one, until the change
+                span = [vert_values.index[i_act - 1], vert_values.index[i_act]]
+
+                if value:
+                    logger.debug(f'Adding vertical highlight for {span[0]} - {span[1]}')
+
+                    shapes.append(
+                        dict(
+                            type="rect", xref=f"x{axes_idx}", yref=f"y{axes_idx} domain", opacity=0.1,
+                            layer="below",
+                            line_width=0,
+                            fillcolor=vert_color,
+                            x0=span[0], x1=span[1],
+                            y0=-0.01, y1=1.01,
+                        ),
+                    )
 
         ## Active state plot
         if conf.get('show_active', False):
@@ -343,23 +438,48 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
         # Add left traces
         min_y = 9999; max_y = -9999
         for trace_conf in conf['traces_left']:
-            trace_color = trace_conf.get("color", None)
-            uncertainty = calculate_uncertainty(df[trace_conf['var_id']], trace_conf['instrument']) if trace_conf.get(
-                "instrument", None) else None
-            show_arrow = len(traces_right) > 0 and trace_conf.get('axis_arrow', False)
-            var_config = vars_config.get(trace_conf['var_id'], None) if vars_config is not None else None
 
-            # Axis range
-            min_y = np.min([min_y, df[trace_conf['var_id']].min()])
-            max_y = np.max([max_y, df[trace_conf['var_id']].max()])
+            if trace_conf['var_id'].endswith('*'):
+                # Group of variables
+                group = trace_conf['var_id'][:-1]
+                group_vars = [var for var in df.columns if var.startswith(group)]
+
+                for group_var in group_vars:
+                    trace_conf['var_id'] = group_var
+                    var_config = vars_config.get(group_var, {'var_id': group_var})
+
+                    # Axis range
+                    min_y = np.min([min_y, df[group_var].min()])
+                    max_y = np.max([max_y, df[group_var].max()])
+
+                    fig = add_trace(
+                        fig=fig, trace_conf=trace_conf, df=df, yaxes_idx=idx, xaxes_idx=axes_idx,
+                        resample=resample,
+                        axis_side='left',
+                        row_idx=row_idx,
+                        var_config=var_config,
+                        df_comp=df_comp
+                    )
+
+            else:
+                trace_color = trace_conf.get("color", None)
+                uncertainty = calculate_uncertainty(df[trace_conf['var_id']], trace_conf['instrument']) if trace_conf.get(
+                    "instrument", None) else None
+                show_arrow = len(traces_right) > 0 and trace_conf.get('axis_arrow', False)
+                var_config = vars_config.get(trace_conf['var_id'], None) if vars_config is not None else None
+
+                # Axis range
+                min_y = np.min([min_y, df[trace_conf['var_id']].min()])
+                max_y = np.max([max_y, df[trace_conf['var_id']].max()])
             
             fig = add_trace(fig=fig, trace_conf=trace_conf, df=df, yaxes_idx=idx, xaxes_idx=axes_idx, resample=resample,
                             show_arrow=show_arrow, trace_color=trace_color, uncertainty=uncertainty, axis_side='left',
-                            row_idx=row_idx, arrow_xrel_pos=arrow_xrel_pos, var_config=var_config)
+                            row_idx=row_idx, arrow_xrel_pos=arrow_xrel_pos, var_config=var_config, df_comp=df_comp)
 
         # Manually set range for left axis, for some reason it does not work correctly automatically
-        padding = (max_y - min_y) * 0.1 # Creo que lo hice mejor en webscada, revisar
-        yaxes_settings[f'yaxis{axes_idx}']['range'] = [min_y - padding, max_y + padding]
+        if conf.get('ylims_left', None) == 'manual':
+            padding = (max_y - min_y) * 0.1 # Creo que lo hice mejor en webscada, revisar
+            yaxes_settings[f'yaxis{axes_idx}']['range'] = [min_y - padding, max_y + padding]
 
         # logger.debug(f'Left axis range: {yaxes_settings[f"yaxis{axes_idx}"]["range"]}')
 
@@ -389,9 +509,10 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                     show_arrow = trace_conf.get('axis_arrow', False)
                     var_config = vars_config.get(trace_conf['var_id'], None) if vars_config is not None else None
 
+                    logger.debug(f'Adding trace {trace_conf["var_id"]} to right axis {idx}')
                     fig = add_trace(fig=fig, trace_conf=trace_conf, df=df, yaxes_idx=idx, xaxes_idx=axes_idx, resample=resample,
                                     show_arrow=show_arrow, trace_color=trace_color, uncertainty=uncertainty, axis_side='right',
-                                    row_idx=row_idx, arrow_xrel_pos=arrow_xrel_pos, var_config=var_config)
+                                    row_idx=row_idx, arrow_xrel_pos=arrow_xrel_pos, var_config=var_config, df_comp=df_comp)
 
                 # Add index for each right axis added
                 idx += 1
@@ -435,14 +556,18 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
             font=dict(size=10)
         )
 
+    if title_text is None:
+        # Get from plot configuration
+        title_text = f"<b>{plt_config.get('title', None)}</b><br>{plt_config.get('subtitle', None)}</br>"
 
     fig.update_layout(
-        title_text=f"<b>{plt_config['title']}</b><br>{plt_config['subtitle']}</br>" if plt_config.get('title',
-                                                                                                      None) else None,
+        title_text=title_text,
         title_x=0.05,  # Title position, 0 is left, 1 is right
         height=height,
         width=width,
+        # plot_bgcolor='#ffffff',
         plot_bgcolor='rgba(0,0,0,0)',
+        # paper_bgcolor='#ffffff',
         # paper_bgcolor='rgba(0,0,0,0)',
         # title_text="Complex Plotly Figure Layout",
         # margin=dict(l=20, r=200, t=100, b=20, pad=5),
@@ -453,6 +578,11 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
         shapes=shapes,
         newshape=newshape_style,
         hovermode='x unified',
+        hoverlabel=dict(
+            bgcolor="white",
+            font_size=12,
+            # font_family="Rockwell"
+        ),
     )
     fig.update_xaxes(domain=xdomain)
 
