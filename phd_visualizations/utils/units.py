@@ -221,7 +221,7 @@ def to_m3h(q: ArrayLike, unit:Literal[supported_volumetric_flow_units + supporte
     elif unit == "Ls":
         return q * 3.6
     elif unit == "Lmin":
-        return q / 60
+        return q * 60/1000
     elif unit in supported_mass_flow_units:
         if P_MPa is None or T_K is None:
             raise ValueError("Pressure (MPa) and temperature (K) must be provided to convert mass flow to volumetric flow")
@@ -244,7 +244,7 @@ def m3h_to(q: ArrayLike, unit:Literal[supported_volumetric_flow_units + supporte
     elif unit == "Ls":
         return q / 3.6
     elif unit == "Lmin":
-        return q * 60
+        return q * 1000/60
     elif unit in supported_mass_flow_units:
         if P is None or T is None:
             raise ValueError("Pressure (MPa) and temperature (K) must be provided to convert mass flow to volumetric flow")
