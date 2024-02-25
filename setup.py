@@ -13,5 +13,5 @@ setup(
     author_email='jmserrano@psa.es',
     description='Several visualizations implemented during my PhD studies, mainly using plotly (with plotly resampler) and matplotlib',
     packages=find_packages(),  # automatically find all packages and subpackages
-    install_requires=find_dependencies(),
+    # install_requires=find_dependencies(),
 )
