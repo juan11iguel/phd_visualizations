@@ -1,3 +1,4 @@
+import copy
 
 # TODO: Plotly resampler, resampling does not work whenever the is more than one plot, works with multiple legends,
 #  and multiple yaxes, must have something to do with the way axis are configured
@@ -12,17 +13,15 @@ from typing import Literal
 import plotly
 import plotly.graph_objects as go
 from loguru import logger
-from .constants import color_palette, default_fontsize, newshape_style, ArrayLike
+from .constants import color_palette, default_fontsize, newshape_style, ArrayLike, named_css_colors
 from .calculations import calculate_uncertainty
-from plotly_resampler import FigureResampler
 
 legends_plotly_ids = {}
 
-def add_trace(fig: go.Figure | FigureResampler, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int, xaxes_idx: int,
+def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int, xaxes_idx: int,
               resample: bool, show_arrow: bool = False, trace_color: str = None, uncertainty: ArrayLike = None, row_idx: int = None,
               axis_side:Literal['left', 'right'] = 'left', arrow_xrel_pos:int = None, var_config:dict = None,
-              df_comp: pd.DataFrame = None) -> go.Figure | FigureResampler:
-
+              df_comp: list[pd.DataFrame] = None, **kwargs) -> go.Figure:
 
     """ Add custom trace to plotly figure, it can include:
         - Uncertainty bounds
@@ -30,6 +29,9 @@ def add_trace(fig: go.Figure | FigureResampler, trace_conf: dict, df: pd.DataFra
 
 
     """
+
+    logger.debug(f'Attempting to add {trace_conf["var_id"]}')
+
     var_config = var_config if var_config is not None else {}
 
     if trace_color is not None:
@@ -53,7 +55,12 @@ def add_trace(fig: go.Figure | FigureResampler, trace_conf: dict, df: pd.DataFra
     if name is None:
         name = var_config.get('label_html', None)
     if name is None:
-        name = var_config['var_id']
+        name = var_config.get('var_id', None)
+    if name is None:
+        name = trace_conf.get('var_id', None)
+
+    # if name is None:
+    #     raise KeyError(f'No name for variable {} could be found in any of the available options')
 
     if showlegend:
         logger.debug(f'legend_id: {legend_id}, legend: {legend} for trace {name}')
@@ -91,10 +98,58 @@ def add_trace(fig: go.Figure | FigureResampler, trace_conf: dict, df: pd.DataFra
 
     # Add trace
     plotly_resample_kwargs = {'hf_x': df.index, 'hf_y': df[trace_conf['var_id']]} if resample else {}
-    plotly_resample_kwargs_comp = {'hf_x': df_comp.index, 'hf_y': df_comp[trace_conf['var_id']]} if (resample and df_comp is not None) else {}
+
+    # Movido más abajo al añadir soporte para múltiples comparaciones
+    # plotly_resample_kwargs_comp = {'hf_x': df_comp[i].index, 'hf_y': df_comp[i][trace_conf['var_id']]} if (resample and df_comp[i] is not None) else {}
+
+    if df_comp is not None:
+        # default = np.ones(df[trace_conf['var_id']].shape)*np.nan
+        # The comparison data provided is a list of dataframes, which might or might not include data for the specified variable
+        customdata = [df_comp_.get(trace_conf['var_id'], None) for df_comp_ in df_comp]
+    else:
+        # No comparison data provided
+        customdata = None
+
+    if customdata is not None and not all(element is None for element in customdata):
+        customdata = np.stack(customdata, axis=-1)
+
+        # hovertemplate = "%{y:.2f} (<span style='color:gray'> %{customdata:.2f} </span>)"
+        hovertemplate = "%{y:.2f} "
+        for i in range(customdata.shape[1]):
+            comp = customdata[:, i]
+            if comp is not None:
+                plotly_resample_kwargs_comp = {'hf_x': df.index, 'hf_y': comp} if resample else {}
+
+                hovertemplate += f"(<span style='color:{named_css_colors[i]}'> %{{customdata[{i}]:.2f}} </span>) "
+
+                # if trace_conf['var_id'] in df_comp[i].columns:
+                fig.add_trace(
+                    go.Scattergl(
+                        x=df.index if not resample else None,
+                        y=comp if not resample else None,
+                        name=f"{name} comparison {i}",
+                        mode='lines',
+                        line=dict(
+                            color=named_css_colors[i],
+                            dash='dash',
+                            width=1.5
+                        ),
+                        showlegend=False,
+                        xaxis=f'x{xaxes_idx}',
+                        yaxis=f'y{yaxes_idx}',
+                        # Hide tooltip
+                        hoverinfo='skip'
+                    ),
+                    **plotly_resample_kwargs_comp
+                )
+            else:
+                logger.debug(
+                    f'Cant add comparison trace for {trace_conf["var_id"]} since it does not exist in df_comp[{i}]')
+    else:
+        hovertemplate = "%{y:.2f}"
 
     fig.add_trace(
-        go.Scattergl(
+        go.Scatter(
             x=df.index if not resample else None,
             y=df[trace_conf['var_id']] if not resample else None,
             name=name,
@@ -104,39 +159,26 @@ def add_trace(fig: go.Figure | FigureResampler, trace_conf: dict, df: pd.DataFra
                 dash=trace_conf.get('dash', None),
                 width=trace_conf.get('width', None)
             ),
+            fill=trace_conf.get('fill', None), #fillcolor=f'rgba({color_rgb}, 0.1)',
+            stackgroup=kwargs.get('stackgroup', None),
             showlegend=showlegend,
             legend=legend,
             xaxis=f'x{xaxes_idx}',
             yaxis=f'y{yaxes_idx}',
 
             # Add customdata to show comparison values if provided
-            customdata=df_comp[trace_conf['var_id']] if df_comp is not None else None,
-            hovertemplate = "%{y:.2f}" if df_comp is None else "%{y:.2f} (<span style='color:gray'> %{customdata:.2f} </span>)"
+            customdata=customdata,
+            hovertemplate=hovertemplate
         ),
         **plotly_resample_kwargs
     )
 
     # If comparison dataframe is given, add comparison trace
-    if df_comp is not None:
-        fig.add_trace(
-            go.Scattergl(
-                x=df_comp.index if not resample else None,
-                y=df_comp[trace_conf['var_id']] if not resample else None,
-                name=f"{name} comparison",
-                mode='lines',
-                line=dict(
-                    color='gray',
-                    dash='dash',
-                    width=1
-                ),
-                showlegend=False,
-                xaxis=f'x{xaxes_idx}',
-                yaxis=f'y{yaxes_idx}',
-                # Hide tooltip
-                hoverinfo='skip'
-            ),
-            **plotly_resample_kwargs_comp
-        )
+    # if customdata is not None:
+    #     for i, comp in enumerate(customdata):
+    #         if comp is not None:
+    #     else:
+    #         logger.debug(f'Cant add comparison trace for {trace_conf["var_id"]} since it does not exist in df_comp')
 
     logger.info(
         f'Trace {name} added in yaxis{yaxes_idx} ({axis_side}), row {row_idx + 1}, uncertainty: '
@@ -154,30 +196,35 @@ def add_trace(fig: go.Figure | FigureResampler, trace_conf: dict, df: pd.DataFra
         ax = 25 if axis_side == 'left' else -25
 
         fig.add_annotation(
-            x=trace.x[tr_idx] + xshift * datetime.timedelta(seconds=arrow_xrel_pos),
-            y=trace.y[tr_idx] * trace_conf.get('arrow_yrel_pos', 1.05),
+            x=0.1 if axis_side == 'left' else 0.9,  # x=trace.x[tr_idx] + xshift * datetime.timedelta(seconds=arrow_xrel_pos),
+            y=trace_conf.get('arrow_yrel_pos', 0.1), # y=trace.y[tr_idx] * trace_conf.get('arrow_yrel_pos', 1.05),
             arrowhead=2, arrowsize=1.5, arrowwidth=1,  # Arrow line width
             arrowcolor=trace.line.color,  # Arrow color
-            ax=ax, ay=0, xref=f'x{xaxes_idx}', yref=f'y{xaxes_idx}', showarrow=True,
+            ax=ax, ay=0, xref=f'x{xaxes_idx} domain', yref=f'y{xaxes_idx} domain', showarrow=True,
         )
 
     return fig
 
 def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.DataFrame | None = None,
-                              df_comp: pd.DataFrame | None = None, title_text: str = None,
+                              df_comp: pd.DataFrame | list[pd.DataFrame] = None, title_text: str = None,
                               resample: bool = True, vars_config: dict = None) -> go.Figure:
 
     """ Generate plotly figure with experimental results
 
-    # TODO: If df_comp is given, duplicate each trace from plt_config with a gray color and a dashed line,
-    # and tune the tooltip to show the original and the comparison value
+    # TODO: Allow df_comp to be a list, and automatically add it with different colors for the line and tooltips
 
     """
+
+    if resample:
+        from plotly_resampler import FigureResampler
 
     if resample:
         fig = FigureResampler(go.Figure(), )
     else:
         fig = go.Figure()
+
+    if df_comp is not None and not isinstance(df_comp, list):
+        df_comp = [df_comp]
 
     row_heights = []
     n_yaxis = []
@@ -279,7 +326,7 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                     if vert_conf['color'] in color_palette.keys():
                         vert_color = color_palette[vert_conf['color']]
                     else:
-                        logger.warning(f'Color {conf["active_color"]} not found in color_palette, using default color')
+                        logger.warning(f'Color {vert_conf["active_color"]} not found in color_palette, using default color')
                         vert_color = color_palette['plotly_yellow']
 
                 else:
@@ -440,25 +487,31 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
         for trace_conf in conf['traces_left']:
 
             if trace_conf['var_id'].endswith('*'):
+
+                logger.debug(f'Found a group of variables to be plot: {trace_conf["var_id"]}')
+
                 # Group of variables
-                group = trace_conf['var_id'][:-1]
+                group = trace_conf["var_id"][:-1]
                 group_vars = [var for var in df.columns if var.startswith(group)]
 
+                trace_conf_copy = copy.deepcopy(trace_conf)
+                vars_config_copy = copy.deepcopy(vars_config)
                 for group_var in group_vars:
-                    trace_conf['var_id'] = group_var
-                    var_config = vars_config.get(group_var, {'var_id': group_var})
+                    trace_conf_copy['var_id'] = group_var
+                    var_config = vars_config_copy.get(group_var, {'var_id': group_var})
 
                     # Axis range
-                    min_y = np.min([min_y, df[group_var].min()])
-                    max_y = np.max([max_y, df[group_var].max()])
+                    min_y = np.nanmin([min_y, df[group_var].min()])
+                    max_y = np.nanmax([max_y, df[group_var].max()])
 
                     fig = add_trace(
-                        fig=fig, trace_conf=trace_conf, df=df, yaxes_idx=idx, xaxes_idx=axes_idx,
+                        fig=fig, trace_conf=trace_conf_copy, df=df, yaxes_idx=idx, xaxes_idx=axes_idx,
                         resample=resample,
                         axis_side='left',
                         row_idx=row_idx,
                         var_config=var_config,
-                        df_comp=df_comp
+                        df_comp=df_comp,
+                        stackgroup=group if 'fill' in trace_conf else None
                     )
 
             else:
@@ -469,12 +522,12 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                 var_config = vars_config.get(trace_conf['var_id'], None) if vars_config is not None else None
 
                 # Axis range
-                min_y = np.min([min_y, df[trace_conf['var_id']].min()])
-                max_y = np.max([max_y, df[trace_conf['var_id']].max()])
+                min_y = np.nanmin([min_y, df[trace_conf['var_id']].min()])
+                max_y = np.nanmax([max_y, df[trace_conf['var_id']].max()])
             
-            fig = add_trace(fig=fig, trace_conf=trace_conf, df=df, yaxes_idx=idx, xaxes_idx=axes_idx, resample=resample,
-                            show_arrow=show_arrow, trace_color=trace_color, uncertainty=uncertainty, axis_side='left',
-                            row_idx=row_idx, arrow_xrel_pos=arrow_xrel_pos, var_config=var_config, df_comp=df_comp)
+                fig = add_trace(fig=fig, trace_conf=trace_conf, df=df, yaxes_idx=idx, xaxes_idx=axes_idx, resample=resample,
+                                show_arrow=show_arrow, trace_color=trace_color, uncertainty=uncertainty, axis_side='left',
+                                row_idx=row_idx, arrow_xrel_pos=arrow_xrel_pos, var_config=var_config, df_comp=df_comp)
 
         # Manually set range for left axis, for some reason it does not work correctly automatically
         if conf.get('ylims_left', None) == 'manual':
@@ -500,6 +553,10 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                                                      title=titles[pos_idx])
 
                 for trace_idx, trace_conf in enumerate(traces_config):
+
+                    if trace_conf['var_id'].endswith('*'):
+                        raise NotImplementedError(f'Currently, groups of variables are not supported for the right yaxis')
+
                     # Add trace
                     trace_color = trace_conf.get("color", None)
                     # color = color_palette[trace_color] if trace_color in color_palette.keys() else trace_color
