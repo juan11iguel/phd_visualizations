@@ -45,3 +45,7 @@ def rename_signal_ids_to_var_ids(df: pd.DataFrame, vars_config: dict) -> pd.Data
             df.rename(columns={signal_name: var_id}, inplace=True)
 
     return df
+
+
+def tuple_to_string(input_tuple):
+    return ', '.join(str(i) for i in input_tuple)
