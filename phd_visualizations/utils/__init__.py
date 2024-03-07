@@ -1,6 +1,23 @@
 import pandas as pd
 from loguru import logger
+import numpy as np
 
+class ColorChooser:
+    def __init__(self, color_options):
+        self.color_options = color_options
+        self.last_choice = None
+
+    def choose(self):
+        available_options = [option for option in self.color_options if option != self.last_choice]
+        self.last_choice = np.random.choice(available_options)
+        return self.last_choice
+
+Operators = {
+    '<=': lambda x, y: x <= y,
+    '>=': lambda x, y: x >= y,
+    '<': lambda x, y: x < y,
+    '>': lambda x, y: x > y
+}
 
 def rename_signal_ids_to_var_ids(df: pd.DataFrame, vars_config: dict) -> pd.DataFrame:
     """

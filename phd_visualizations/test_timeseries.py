@@ -15,10 +15,11 @@ import plotly.graph_objects as go
 from loguru import logger
 from .constants import color_palette, default_fontsize, newshape_style, ArrayLike, named_css_colors
 from .calculations import calculate_uncertainty
-from .utils import tuple_to_string
+from .utils import tuple_to_string, ColorChooser, Operators
 from plotly.colors import hex_to_rgb, qualitative
 
 legends_plotly_ids = {}
+color_chooser = ColorChooser([color_palette['plotly_green_rgb'], color_palette['plotly_red_rgb']])
 
 def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int, xaxes_idx: int,
               resample: bool, show_arrow: bool = False, trace_color: str = None, uncertainty: ArrayLike = None, row_idx: int = None,
@@ -32,16 +33,18 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
 
     """
 
-    logger.debug(f'Attempting to add {trace_conf["var_id"]}')
+    var_id = trace_conf["var_id"]
+
+    logger.debug(f'Attempting to add {var_id}')
 
     var_config = var_config if var_config is not None else {}
 
     if trace_color is not None:
-        if 'opacity' in trace_conf:
-            color = color_palette[trace_color + '_rgb'] if trace_color + '_rgb' in color_palette.keys() else trace_color
-            color = f'rgba({color}, {trace_conf["opacity"]})'
-        else:
-            color = color_palette[trace_color] if trace_color in color_palette.keys() else trace_color
+        color = color_palette[trace_color] if trace_color in color_palette.keys() else trace_color
+        try:
+            color_rgb = color_palette[trace_color + '_rgb'] if trace_color + '_rgb' in color_palette.keys() else trace_color
+        except KeyError:
+            raise KeyError(f'Every color defined in the plot configuration must have a corresponding _rgb color in the color_palette, {trace_color} rgb variant not found')
     else:
         color = None
 
@@ -71,16 +74,29 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
     if showlegend:
         logger.debug(f'legend_id: {legend_id}, legend: {legend} for trace {name}')
 
+    # Conditional plot
+    if 'conditional' in trace_conf:
+        c = trace_conf['conditional']
+        try:
+            active_signal = df.apply(lambda row: Operators[c['operator']](row[c['var_id']], c['threshold_value']), axis="columns")
+
+            df.loc[~active_signal, var_id] = np.nan
+
+            logger.debug(f'Conditional trace {var_id}: Not showing {np.sum(~active_signal)} out of {len(df)} points since condition {c["var_id"]} {c["operator"]} {c["threshold_value"]} was not met')
+        except KeyError:
+            raise KeyError(f"Conditional plot set up for {var_id}, but one of the required arguments is missing: 'operator', 'threshold_value', 'var_id'")
+
     # Add uncertainty
     if uncertainty is not None:
         color_rgb = color_palette[trace_color + '_rgb'] if trace_color + '_rgb' in color_palette.keys() else trace_color
 
-        plotly_resample_kwargs = {'hf_x': df.index, 'hf_y': df[trace_conf['var_id']] - uncertainty} if resample else {}
+        plotly_resample_kwargs = {'hf_x': df.index, 'hf_y': df[var_id] - uncertainty} if resample else {}
         fig.add_trace(
             go.Scattergl(
                 x=df.index if not resample else None,
-                y=df[trace_conf['var_id']] - uncertainty if not resample else None,
+                y=df[var_id] - uncertainty if not resample else None,
                 name=f"{name} uncertainty lower bound",
+                mode='lines',
                 fill=None, line=dict(color='rgba(255,255,255,0)'),
                 showlegend=False,
                 xaxis=f'x{xaxes_idx}', yaxis=f'y{yaxes_idx}',
@@ -88,12 +104,13 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
             **plotly_resample_kwargs
         )
 
-        plotly_resample_kwargs = {'hf_x': df.index, 'hf_y': df[trace_conf['var_id']] + uncertainty} if resample else {}
+        plotly_resample_kwargs = {'hf_x': df.index, 'hf_y': df[var_id] + uncertainty} if resample else {}
         fig.add_trace(
             go.Scattergl(
                 x=df.index if not resample else None,
                 y=df[trace_conf['var_id']] + uncertainty if not resample else None,
                 name=f"{name} uncertainty",
+                mode='lines',
                 fill='tonexty', fillcolor=f'rgba({color_rgb}, 0.1)',
                 line=dict(color='rgba(255,255,255,0)'),
                 showlegend=False,
@@ -101,9 +118,6 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
             ),
             **plotly_resample_kwargs
         )
-
-    # Add trace
-    plotly_resample_kwargs = {'hf_x': df.index, 'hf_y': df[trace_conf['var_id']]} if resample else {}
 
     # Movido más abajo al añadir soporte para múltiples comparaciones
     # plotly_resample_kwargs_comp = {'hf_x': df_comp[i].index, 'hf_y': df_comp[i][trace_conf['var_id']]} if (resample and df_comp[i] is not None) else {}
@@ -147,8 +161,8 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
                         name=f"{name} comparison {i}",
                         mode='lines',
                         line=dict(
-                            color=named_css_colors[i],
-                            dash='longdash',
+                            color=named_css_colors[i] if i>0 and color is None else color,
+                            dash='dot',
                             width=2
                         ),
                         showlegend=False,
@@ -165,6 +179,29 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
     else:
         hovertemplate = "%{y:.2f}"
 
+    # Configure fill_between
+    if trace_conf.get('fill_between', False):
+        fill_between = True
+        compared_var_id = trace_conf['fill_between']
+        try:
+            comp_name = f"{var_id}_gt_{compared_var_id}"
+            df[comp_name] = df.apply(
+                # Should be > but for some reason it works with <, probably because of the way the traces are added
+                lambda row: row[var_id] if row[var_id] < row[compared_var_id] else row[compared_var_id], axis="columns"
+            )
+        except KeyError:
+            raise KeyError(f'Attempted to add a trace with a fill between variable {compared_var_id}, but it could not be found in the dataframe')
+    else:
+        fill_between = False
+
+    # Add trace
+    plotly_resample_kwargs = {'hf_x': df.index, 'hf_y': df[trace_conf['var_id']]} if resample else {}
+
+
+    # Set trace color with opacity if specified
+    if color is not None and 'opacity' in trace_conf:
+        color = f'rgba({color_rgb}, {trace_conf["opacity"]})'
+
     fig.add_trace(
         go.Scatter(
             x=df.index if not resample else None,
@@ -176,7 +213,7 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
                 dash=trace_conf.get('dash', None),
                 width=trace_conf.get('width', None)
             ),
-            fill=trace_conf.get('fill', None), #fillcolor=f'rgba({color_rgb}, 0.1)',
+            fill=trace_conf.get('fill', None) if not fill_between else None, #fillcolor=f'rgba({color_rgb}, 0.1)',
             fillpattern=dict(shape=trace_conf.get('fill_pattern', None)),
             stackgroup=kwargs.get('stackgroup', None),
             showlegend=showlegend,
@@ -190,6 +227,50 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
         ),
         **plotly_resample_kwargs
     )
+
+    # Add additional trace for fill_between
+    if fill_between:
+        if color is not None:
+            # color_rgb should've been generated together with color if a color was specified in the trace config
+            color_fill = f'rgba({color_rgb}, 0.3)'
+        else:
+            logger.warning(f'No color specified for fill_between trace {var_id}, choosing randomly between green and red')
+            color_options = [color_palette['plotly_green_rgb'], color_palette['plotly_red_rgb']]
+            # Do a random choice between green and red 🤷‍♀️
+            color_fill = f'rgba({color_chooser.choose()}, 0.3)'
+
+        fig.add_trace(
+            go.Scatter(
+                x=df.index,
+                y=df[comp_name],
+                mode='lines',
+                name=comp_name,
+                line=dict(color=color, width=0),
+                connectgaps=False,
+                fill='tonexty',
+                fillcolor=color_fill,
+                showlegend=showlegend,
+                legend=legend,
+                xaxis=f'x{xaxes_idx}',
+                yaxis=f'y{yaxes_idx}',
+                hoverinfo='skip'
+            )
+        )
+
+        # https://stackoverflow.com/a/75094341/13853313
+        # We need to use an invisible trace so we can reset "next y" for the negative area indicator
+        fig.add_trace(
+            go.Scatter(
+                x=df.index,
+                y=df[var_id],
+                line_color="rgba(0,0,0,0)",
+                showlegend=False,
+                xaxis=f'x{xaxes_idx}',
+                yaxis=f'y{yaxes_idx}',
+                hoverinfo='skip'
+            )
+        )
+
 
     # If comparison dataframe is given, add comparison trace
     # if customdata is not None:
@@ -462,7 +543,7 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                 active_color = default_active_color
 
             ### Shift axes idx to +100 to avoid overlapping with other axes
-            aux_idx = axes_idx if isinstance(axes_idx, int) else 0 + 100
+            aux_idx = (axes_idx if isinstance(axes_idx, int) else 0) + 100
 
             ### Calculate times when the system changes state
             change_times = active.index[active.diff() != 0]

@@ -12,6 +12,7 @@ color_palette = OrderedDict({
     "bg_gray": "#B6B6B6", "bg_gray_rgb": "182, 182, 182",
     "bg_blue": "steelblue", "bg_blue_rgb": "70, 130, 180",
     "bg_orange": "#e66100", "bg_orange_rgb": "230, 97, 0",
+    "bg_red": "#b2182b", "bg_red_rgb": "178, 24, 43",
     "gray": "#9a9996", "gray_rgb": "154, 153, 150",
     "yellow": "#e5a50a", "yellow_rgb": "229, 165, 10",
     "plotly_blue": "#636EFA", "plotly_blue_rgb": "99, 110, 250",
