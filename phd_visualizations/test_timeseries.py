@@ -123,6 +123,7 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
     # plotly_resample_kwargs_comp = {'hf_x': df_comp[i].index, 'hf_y': df_comp[i][trace_conf['var_id']]} if (resample and df_comp[i] is not None) else {}
 
     if df_comp is not None:
+        N_comp = len(df_comp)
         # default = np.ones(df[trace_conf['var_id']].shape)*np.nan
         # The comparison data provided is a list of dataframes, which might or might not include data for the specified variable
         customdata = []
@@ -153,6 +154,11 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
 
                 hovertemplate += f"(<span style='color:{named_css_colors[i]}'> %{{customdata[{i}]:.2f}} </span>) "
 
+                if (i > 0 and color is None) or N_comp > 1:
+                    color_comp = named_css_colors[i]
+                else:
+                    color_comp = color
+
                 # if trace_conf['var_id'] in df_comp[i].columns:
                 fig.add_trace(
                     go.Scattergl(
@@ -161,7 +167,7 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
                         name=f"{name} comparison {i}",
                         mode='lines',
                         line=dict(
-                            color=named_css_colors[i] if i>0 and color is None else color,
+                            color=color_comp,
                             dash='dot',
                             width=2
                         ),
@@ -325,13 +331,9 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
     if df_comp is not None and not isinstance(df_comp, list):
         df_comp = [df_comp]
 
-    row_heights = []
-    n_yaxis = []
-    subplot_titles = []
-    for plot_props in plt_config['plots'].values():
-        row_heights.append(plot_props["row_height"])
-        # plot_bg_colors.append( plot_props.get("plot_bg_colors", "steelblue") )
-        subplot_titles.append(plot_props.get("title", ""))
+    # Create a copy of the input dataframe to avoid modifying the original
+    df = df.copy()
+
 
     # n_yaxis          = [2, 2, 3, 1,   1,  1,  1, 1,   1, 1,   1, 1,   1]
     # plot_bg_colors   = ["steelblue" for _ in range(2)]
@@ -343,12 +345,27 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
     # additional_space = [0, 0, 0, 0,   0,  0,  0, 0,   0, 0,   0, 0,   0] # Number of additional vertical_spacing to leave
     # vertical_spacing = 0.03
     vertical_spacing = plt_config["vertical_spacing"]
+    # reduced_vs = vertical_spacing / 3
     xdomain = plt_config["xdomain"]
     height = plt_config["height"]
     width = plt_config["width"]
     yaxis_right_pos = [.86, .95]
     arrow_xrel_pos = plt_config.get("arrow_xrel_pos", 20)
     default_active_color = {'active': color_palette['plotly_green_rgb'], 'inactive': color_palette['gray_rgb']}
+    # tigth_vertical_spacing = [plot_props.get('tigth_vertical_spacing', False) for plot_props in plt_config['plots'].values()]
+
+    n_plots = len(plt_config['plots'])
+
+    # Every time the vertical spacing is reduced, that reduction is plot area that is asigned equally for all the plots
+    # gained_height_reduced_vs = np.sum(tigth_vertical_spacing) * (vertical_spacing - reduced_vs) / n_plots
+
+    row_heights = []
+    n_yaxis = []
+    subplot_titles = []
+    for plot_props in plt_config['plots'].values():
+        # plot_bg_colors.append( plot_props.get("plot_bg_colors", "steelblue") )
+        subplot_titles.append(plot_props.get("title", ""))
+        row_heights.append(plot_props["row_height"]) #  + gained_height_reduced_vs)
 
     # Configure plot legends
     plot_ids_set = set(plt_config['plots'].keys())
@@ -375,19 +392,24 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
         
     rows = len(row_heights)
 
-    cum_sum = float(sum(row_heights))
+    total_row_heights = float(sum(row_heights))
     heights = []
     for idx, h in enumerate(row_heights):
-        height_ = (1.0 - vertical_spacing * (rows - 1)) * (h / cum_sum)
+        # vs = reduced_vs if tigth_vertical_spacing[idx] else vertical_spacing
+        vs = vertical_spacing # Left unfinished, revisit in another moment
+        height_ = (1.0 - vs * (rows - 1)) * (h / total_row_heights)
         heights.append(round(height_, 3))
 
     # print(heights)
     # print(sum(heights))
 
-    domains = [];
+    domains = []
     y2 = 0 - vertical_spacing
     for row_idx in reversed(range(rows)):
-        y1 = round(y2 + vertical_spacing, 3)
+        # vs = reduced_vs if tigth_vertical_spacing[row_idx] else vertical_spacing # Left unfinished, revisit in another moment
+        vs = vertical_spacing
+
+        y1 = round(y2 + vs, 3)
         y2 = round(y1 + heights[row_idx], 3)
         domains.append((y1, y2))
 
@@ -454,8 +476,7 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
         title = conf.get('ylabels_left', [None])[0]  # Only one axis is supported anyway
 
         if conf.get('tigth_vertical_spacing', None):
-            domain = (domains[row_idx + 1][-1] + vertical_spacing / 3,
-                      # Fill the space between the current and the next axis with some vertical_spacing
+            domain = (domains[row_idx + 1][-1] + vertical_spacing / 3, # Fill the space between the current and the next axis with some vertical_spacing
                       domains[row_idx][-1])  # Not changed
         else:
             domain = domains[row_idx]
