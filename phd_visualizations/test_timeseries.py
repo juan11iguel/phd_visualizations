@@ -321,10 +321,10 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
     """
 
     if resample:
-        from plotly_resampler import FigureResampler
+        from plotly_resampler import FigureWidgetResampler
 
     if resample:
-        fig = FigureResampler(go.Figure(), )
+        fig = FigureWidgetResampler(go.Figure(), )
     else:
         fig = go.Figure()
 
