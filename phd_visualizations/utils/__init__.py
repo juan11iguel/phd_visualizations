@@ -1,8 +1,32 @@
 import pandas as pd
 from loguru import logger
 import numpy as np
+from plotly.colors import hex_to_rgb
+
+def validate_hex_color(hex_str: str) -> bool:
+    if not isinstance(hex_str, str):
+        return False
+    if len(hex_str) != 7:
+        return False
+    if hex_str[0] != '#':
+        return False
+    try:
+        int(hex_str[1:], 16)
+    except ValueError:
+        return False
+    return True
+
+def hex_to_rgba_str(hex_str: str, alpha: float) -> str:
+    if not validate_hex_color(hex_str):
+        raise ValueError(f"Invalid hex color: {hex_str}")
+
+    rgb_col = hex_to_rgb(hex_str)
+    return f"rgba({rgb_col[0]}, {rgb_col[1]}, {rgb_col[2]}, {alpha})"
 
 class ColorChooser:
+    """
+    Terrible name I know, could better be RandomColorPicker or something like that.
+    """
     def __init__(self, color_options):
         self.color_options = color_options
         self.last_choice = None
