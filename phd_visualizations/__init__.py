@@ -12,12 +12,17 @@ VALID_FIGURE_FORMATS: typing.Tuple[Argument, ...] = typing.get_args(Argument)
 
 def save_figure(fig: go.Figure, figure_name: str, figure_path: str | Path | list,
                 formats: VALID_FIGURE_FORMATS,
-                width=600, height=800, scale=2) -> None:
+                width:int=None, height:int=None, scale:float=2) -> None:
 
     """ Save figures in different formats """
 
     if not isinstance(figure_path, list):
         figure_path = [figure_path]
+
+    if width is None:
+        width = fig.layout.width
+    if height is None:
+        height = fig.layout.height
 
     for path in figure_path:
         for fmt in formats:
