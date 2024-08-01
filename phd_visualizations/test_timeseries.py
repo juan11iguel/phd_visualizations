@@ -361,9 +361,9 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
 
     # additional_space = [0, 0, 0, 0,   0,  0,  0, 0,   0, 0,   0, 0,   0] # Number of additional vertical_spacing to leave
     # vertical_spacing = 0.03
-    vertical_spacing = plt_config["vertical_spacing"]
+    vertical_spacing = plt_config.get("vertical_spacing", 0.03)
     # reduced_vs = vertical_spacing / 3
-    xdomain = plt_config["xdomain"]
+    xdomain = plt_config.get("xdomain", [0, 0.85])
     height = plt_config["height"]
     width = plt_config["width"]
     yaxis_right_pos = [.86, .95]
@@ -382,7 +382,7 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
     for plot_props in plt_config['plots'].values():
         # plot_bg_colors.append( plot_props.get("plot_bg_colors", "steelblue") )
         subplot_titles.append(plot_props.get("title", ""))
-        row_heights.append(plot_props["row_height"]) #  + gained_height_reduced_vs)
+        row_heights.append(plot_props.get("row_height", 1)) #  + gained_height_reduced_vs)
 
     # Configure plot legends
     plot_ids_set = set(plt_config['plots'].keys())
@@ -449,36 +449,30 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
         vert_conf = plt_config['vertical_highlights']
         if vert_conf is not None:
             highlight_type = vert_conf.get('type', "normal_trace")
-            if highlight_type == "normal_trace":
-                if 'var_id' in vert_conf.keys():
-                    if vert_conf['var_id'] in df.columns:
-                        vert_values = df[vert_conf['var_id']]
-                    else:
-                        raise ValueError(
-                            f'var_id `{vert_conf["var_id"]}` not found in dataframe')
-                else:
-                    raise ValueError('var_id must be specified in plot configuration if vertical_highlights are enabled')
+            if highlight_type != "normal_trace":
+                raise ValueError(f'highlight_type {highlight_type} not supported')
+            if 'var_id' not in vert_conf.keys():
+                raise ValueError('var_id must be specified in plot configuration if vertical_highlights are enabled')
+            if vert_conf['var_id'] not in df.columns:
+                raise ValueError(f'var_id `{vert_conf["var_id"]}` not found in dataframe')
+            vert_values = df[vert_conf['var_id']]
 
-                ### Color
-                if 'color' in vert_conf.keys():
-                    if vert_conf['color'] in color_palette.keys():
-                        vert_color = color_palette[vert_conf['color']]
-                    else:
-                        logger.warning(f'Color {vert_conf["active_color"]} not found in color_palette, using default color')
-                        vert_color = color_palette['plotly_yellow']
-
+            ### Color
+            if 'color' not in vert_conf.keys():
+                vert_color = color_palette['plotly_yellow']
+            else:
+                if vert_conf['color'] in color_palette.keys():
+                    vert_color = color_palette[vert_conf['color']]
                 else:
+                    logger.warning(f'Color {vert_conf["active_color"]} not found in color_palette, using default color')
                     vert_color = color_palette['plotly_yellow']
 
-                ### Calculate times when the system changes state
-                change_times_vert = vert_values.index[vert_values.diff() != 0]
-                change_times_vert = change_times_vert.insert(len(change_times_vert), vert_values.index[-1])
+            ### Calculate times when the system changes state
+            change_times_vert = vert_values.index[vert_values.diff() != 0]
+            change_times_vert = change_times_vert.insert(len(change_times_vert), vert_values.index[-1])
 
-                ### Make change_times index of vert_values
-                vert_values = vert_values.reindex(change_times_vert, method='ffill')
-            else:
-                raise ValueError(f'highlight_type {highlight_type} not supported')
-
+            ### Make change_times index of vert_values
+            vert_values = vert_values.reindex(change_times_vert, method='ffill')
 
     shapes = []
     idx = 1
@@ -547,7 +541,6 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
 
                 if value:
                     logger.debug(f'Adding vertical highlight for {span[0]} - {span[1]}')
-
                     shapes.append(
                         dict(
                             type="rect", xref=f"x{axes_idx}", yref=f"y{axes_idx} domain", opacity=0.1,
@@ -558,6 +551,41 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                             y0=-0.01, y1=1.01,
                         ),
                     )
+
+        ## Add horizontal area
+        if 'horizontal_area' in conf.keys():
+            area_conf = conf['horizontal_area']
+            area_values = area_conf['values']
+
+            ### Get color
+            default_color = "cool_green"
+            if 'color' not in area_conf.keys():
+                shape_color = color_palette[default_color]
+                logger.info(
+                    f'Color not specified for horizontal area, using default color {default_color}')
+
+            else:
+                if area_conf['color'] in color_palette.keys():
+                    shape_color = color_palette[area_conf['color']]
+                else:
+                    logger.warning(f'Color {area_conf["active_color"]} not found in color_palette, using default color {default_color}')
+                    shape_color = color_palette[default_color]
+
+            ### Add the shape
+            # TODO: For some reason, adding this shape makes kaleido not able
+            # to export the figure to an image:
+            # ValueError: Transform failed with error code 525: Cannot read property 'append' of undefined
+            
+            shapes.append(
+                dict(
+                    type="rect", xref=f"x{axes_idx} domain", yref=f"y{axes_idx}", opacity=0.1,
+                    layer="between",
+                    line_width=2,
+                    fillcolor=shape_color,
+                    x0=-0.01, x1=1.01,
+                    y0=area_values[1], y1=area_values[0],
+                ),
+            )
 
         ## Active state plot
         if conf.get('show_active', False):
