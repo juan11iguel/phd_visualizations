@@ -675,7 +675,7 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                 # group = trace_conf["var_id"][:-1]
                 # group_vars = [var for var in df.columns if var.startswith(group)]
 
-                logger.debug(f'Found a group of variables to be plot {trace_conf['var_id']}: {group_vars}')
+                logger.debug(f'Found a group of variables to be plot {trace_conf["var_id"]}: {group_vars}')
 
                 trace_conf_copy = copy.deepcopy(trace_conf)
                 vars_config_copy = copy.deepcopy(vars_config)
