@@ -232,7 +232,8 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
 
     # Set trace color with opacity if specified
     if color is not None and 'opacity' in trace_conf:
-        color = hex_to_rgba_str(color, alpha=trace_conf['opacity'])
+        if not color.startswith("rgba"):
+            color = hex_to_rgba_str(color, alpha=trace_conf['opacity'])
 
     fig.add_trace(
         go.Scatter(
