@@ -142,9 +142,15 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
                 # Propagate the conditionals to the comparison data
                 if active_signal is not None:
                     # Re-evaluate for the comp trace
-                    active_signal = df_comp_.apply(
-                        lambda row: Operators[c['operator']](row[c['var_id']], c['threshold_value']), axis="columns")
-                    df_comp_.loc[~active_signal, var_id] = np.nan
+                    try:
+                        active_signal = df_comp_.apply(
+                            lambda row: Operators[c['operator']](row[c['var_id']], c['threshold_value']),
+                            axis="columns")
+                        df_comp_.loc[~active_signal, var_id] = np.nan
+                    except KeyError:
+                        logger.warning(
+                            f"Conditional plot set up for {var_id}, but one of the required signals is missing from the comparison dataframe(s): {df_comp_['var_id']}"
+                        )
 
                 data_comp = df_comp_[var_id]
 
