@@ -2,6 +2,7 @@ import pandas as pd
 from loguru import logger
 import numpy as np
 from plotly.colors import hex_to_rgb
+from PIL import Image
 
 def validate_hex_color(hex_str: str) -> bool:
     if not isinstance(hex_str, str):
@@ -90,3 +91,26 @@ def rename_signal_ids_to_var_ids(df: pd.DataFrame, vars_config: dict) -> pd.Data
 
 def tuple_to_string(input_tuple):
     return ', '.join(str(i) for i in input_tuple)
+
+
+def stack_images_vertically(image_path_top: Path, image_path_bottom: Path, output_path: Path):
+    # Load the images
+    top_image = Image.open(image_path_top)
+    bottom_image = Image.open(image_path_bottom)
+    
+    # Calculate dimensions for the new image
+    total_height = top_image.height + bottom_image.height
+    max_width = max(top_image.width, bottom_image.width)
+    
+    # Create a new image with appropriate dimensions
+    new_image = Image.new('RGB', (max_width, total_height))
+    
+    # Paste the top image at the top of the new image
+    new_image.paste(top_image, (0, 0))
+    
+    # Paste the bottom image below the top image
+    new_image.paste(bottom_image, (0, top_image.height))
+    
+    # Save or display the new image
+    new_image.save(output_path, )
+    # new_image.show()  # Uncomment to display the image
