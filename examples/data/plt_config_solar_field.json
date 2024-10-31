@@ -1,0 +1,101 @@
+{
+    "title": "Solar field",
+    "subtitle": "model validation",
+    "height": 1400,
+    "width": 1000,
+    "margin": {
+        "l": 20,
+        "r": 20,
+        "t": 100,
+        "b": 20,
+        "pad": 5
+    },
+    "vertical_spacing": 0.03,
+    "xdomain": [
+        0,
+        0.85
+    ],
+    "plots": {
+        "environment": {
+            "title": "Environment",
+            "row_height": 0.8,
+            "bg_color": "steelblue",
+            "ylabels_left": [
+                "\u00baC"
+            ],
+            "ylabels_right": [
+                "I (W/m<sup>2</sup>)"
+            ],
+            "ylims_left": "manual",
+            "traces_left": [
+                {
+                    "var_id": "Tamb",
+                    "mode": "lines",
+                    "color": "plotly_green",
+                    "axis_arrow": true,
+                    "arrow_yrel_pos": 0.9
+                }
+            ],
+            "traces_right": [
+                {
+                    "var_id": "I",
+                    "mode": "lines",
+                    "color": "plotly_yellow",
+                    "axis_arrow": true,
+                    "arrow_yrel_pos": 0.1
+                }
+            ]
+        },
+        "temperatures": {
+            "title": "<b>Temperatures</b>",
+            "row_height": 1,
+            "bg_color": "bg_gray",
+            "ylabels_left": [
+                "\u00baC"
+            ],
+            "ylims_left": "manual",
+            "traces_left": [
+                {
+                    "var_id": "Tsf_in_l*",
+                    "dash": "longdash",
+                    "opacity": 0.3
+                },
+                {
+                    "var_id": "Tsf_out_l*",
+                    "opacity": 0.3
+                },
+                {
+                    "var_id": "Tsf_in",
+                    "color": "plotly_red",
+                    "width": 5,
+                    "dash": "dashdot"
+                },
+                {
+                    "var_id": "Tsf_out",
+                    "color": "plotly_red",
+                    "width": 5
+                }
+            ]
+        },
+        "flows": {
+            "title": "<b>Total flow</b> and per loop",
+            "row_height": 1,
+            "bg_color": "bg_gray",
+            "ylabels_left": [
+                "m<sup>3</sup>/h"
+            ],
+            "ylims_left": "manual",
+            "traces_left": [
+                {
+                    "var_id": "qsf_l*",
+                    "fill": "tonexty"
+                },
+                {
+                    "var_id": "qsf",
+                    "color": "plotly_yellow",
+                    "width": 5
+                }
+            ]
+        }
+    }
+}

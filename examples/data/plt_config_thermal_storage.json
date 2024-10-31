@@ -1,0 +1,221 @@
+{
+    "title": "Thermal storage",
+    "subtitle": "model validation",
+    "height": 1000,
+    "width": 1000,
+    "margin": {
+        "l": 20,
+        "r": 100,
+        "t": 100,
+        "b": 20,
+        "pad": 5
+    },
+    "vertical_spacing": 0.03,
+    "xdomain": [
+        0,
+        0.85
+    ],
+    "arrow_xrel_pos": 60,
+    "plots": {
+        "thermal_storage_flows": {
+            "title": "<b>Thermal storage</b>",
+            "row_height": 1,
+            "bg_color": "bg_gray",
+            "ylabels_left": [
+                "m<sup>3</sup>/h"
+            ],
+            "ylims_left": "manual",
+            "traces_left": [
+                {
+                    "var_id": "qts_dis",
+                    "name": "q<sub>ts,dis</sub>",
+                    "mode": "lines",
+                    "color": "plotly_blue",
+                    "width": 3
+                },
+                {
+                    "var_id": "qts_src",
+                    "name": "q<sub>ts,src</sub>",
+                    "mode": "lines",
+                    "color": "plotly_red",
+                    "width": 3
+                }
+            ]
+        },
+        "thermal_storage_power_balance": {
+            "row_height": 1,
+            "title": "Power balance",
+            "bg_color": "bg_gray",
+            "ylabels_left": [
+                "kW<sub>th</sub>"
+            ],
+            "ylims_left": [
+                0,
+                260
+            ],
+            "traces_left": [
+                {
+                    "var_id": "Pts_src",
+                    "name": "P<sub>ts,src</sub>",
+                    "mode": "lines",
+                    "color": "plotly_yellow",
+                    "width": 3,
+                    "fill_between": "Pts_dis"
+                },
+                {
+                    "var_id": "Pts_dis",
+                    "name": "P<sub>ts,dis</sub>",
+                    "mode": "lines",
+                    "color": "wct_purple",
+                    "width": 3,
+                    "fill_between": "Pts_src"
+                }
+            ]
+        },
+        "temperature_hot_top": {
+            "row_height": 1,
+            "title": "Hot - top",
+            "bg_color": "bg_blue",
+            "ylabels_left": [
+                "\u2070C"
+            ],
+            "ylims_left": [
+                60,
+                100
+            ],
+            "tight_vertical_spacing": true,
+            "traces_left": [
+                {
+                    "var_id": "Tts_h_t",
+                    "mode": "lines",
+                    "color": "plotly_red",
+                    "width": 3
+                },
+                {
+                    "var_id": "Tts_h_in",
+                    "mode": "markers",
+                    "color": "plotly_yellow",
+                    "width": 3,
+                    "opacity": 0.5,
+                    "conditional": {
+                        "var_id": "qts_src",
+                        "operator": ">",
+                        "threshold_value": 1
+                    }
+                },
+                {
+                    "var_id": "Tts_h_out",
+                    "mode": "markers",
+                    "color": "wct_purple",
+                    "width": 3,
+                    "opacity": 0.5,
+                    "conditional": {
+                        "var_id": "qts_dis",
+                        "operator": ">",
+                        "threshold_value": 1
+                    }
+                }
+            ]
+        },
+        "temperatures_hot_med": {
+            "row_height": 1,
+            "title": "Hot - medium",
+            "bg_color": "bg_blue",
+            "ylabels_left": [
+                "\u2070C"
+            ],
+            "ylims_left": "manual",
+            "tight_vertical_spacing": true,
+            "traces_left": [
+                {
+                    "var_id": "Tts_h_m",
+                    "mode": "lines",
+                    "color": "plotly_red",
+                    "width": 3
+                }
+            ]
+        },
+        "temperatures_hot_bottom": {
+            "row_height": 1,
+            "title": "Hot - bottom",
+            "bg_color": "bg_blue",
+            "ylabels_left": [
+                "\u2070C"
+            ],
+            "ylims_left": "manual",
+            "traces_left": [
+                {
+                    "var_id": "Tts_h_b",
+                    "mode": "lines",
+                    "color": "plotly_red",
+                    "width": 3
+                }
+            ]
+        },
+        "temperatures_cold_top": {
+            "row_height": 1,
+            "title": "Cold - top",
+            "bg_color": "bg_blue",
+            "ylabels_left": [
+                "\u2070C"
+            ],
+            "ylims_left": "manual",
+            "tight_vertical_spacing": true,
+            "traces_left": [
+                {
+                    "var_id": "Tts_c_t",
+                    "mode": "lines",
+                    "color": "plotly_blue",
+                    "width": 3
+                }
+            ]
+        },
+        "temperatures_cold_med": {
+            "row_height": 1,
+            "title": "Cold - Medium",
+            "bg_color": "bg_blue",
+            "ylabels_left": [
+                "\u2070C"
+            ],
+            "ylims_left": "manual",
+            "tight_vertical_spacing": true,
+            "traces_left": [
+                {
+                    "var_id": "Tts_c_m",
+                    "mode": "lines",
+                    "color": "plotly_blue",
+                    "width": 3
+                }
+            ]
+        },
+        "temperatures_cold_bottom": {
+            "row_height": 1,
+            "title": "Cold - bottom",
+            "bg_color": "bg_blue",
+            "ylabels_left": [
+                "\u2070C"
+            ],
+            "ylims_left": "manual",
+            "traces_left": [
+                {
+                    "var_id": "Tts_c_b",
+                    "mode": "lines",
+                    "color": "plotly_blue",
+                    "width": 3
+                },
+                {
+                    "var_id": "Tts_c_in",
+                    "mode": "markers",
+                    "color": "wct_purple",
+                    "width": 3,
+                    "opacity": 0.5,
+                    "conditional": {
+                        "var_id": "qts_dis",
+                        "operator": ">",
+                        "threshold_value": 1
+                    }
+                }
+            ]
+        }
+    }
+}

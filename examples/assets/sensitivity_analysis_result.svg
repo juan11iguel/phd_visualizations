@@ -1,0 +1,2035 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   class="main-svg"
+   width="800"
+   height="1800"
+   style=""
+   viewBox="0 0 400 900"
+   version="1.1"
+   id="svg240"
+   sodipodi:docname="sensitivity_analysis_result.svg"
+   inkscape:export-filename="sensitivity_analysis_result.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview240"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.64587402"
+     inkscape:cx="355.33245"
+     inkscape:cy="783.43451"
+     inkscape:window-width="1920"
+     inkscape:window-height="1130"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg240" />
+  <rect
+     x="0"
+     y="0"
+     width="400"
+     height="900"
+     style="fill: rgb(255, 255, 255); fill-opacity: 1;"
+     id="rect1" />
+  <defs
+     id="defs-55b34b">
+    <g
+       class="clips"
+       id="g5">
+      <clipPath
+         id="clip55b34bxyplot"
+         class="plotclip">
+        <rect
+           width="325"
+           height="617"
+           id="rect2" />
+      </clipPath>
+      <clipPath
+         class="axesclip"
+         id="clip55b34bx">
+        <rect
+           x="75"
+           y="0"
+           width="325"
+           height="900"
+           id="rect3" />
+      </clipPath>
+      <clipPath
+         class="axesclip"
+         id="clip55b34by">
+        <rect
+           x="0"
+           y="160"
+           width="400"
+           height="617"
+           id="rect4" />
+      </clipPath>
+      <clipPath
+         class="axesclip"
+         id="clip55b34bxy">
+        <rect
+           x="75"
+           y="160"
+           width="325"
+           height="617"
+           id="rect5" />
+      </clipPath>
+    </g>
+    <g
+       class="gradients"
+       id="g13">
+      <linearGradient
+         x1="1"
+         y1="0"
+         x2="0"
+         y2="0"
+         gradientUnits="objectBoundingBox"
+         id="g55b34b-cb78ccec">
+        <stop
+           offset="0%"
+           stop-color="rgb(8, 29, 88)"
+           stop-opacity="1"
+           id="stop5" />
+        <stop
+           offset="12.5%"
+           stop-color="rgb(37, 52, 148)"
+           stop-opacity="1"
+           id="stop6" />
+        <stop
+           offset="25%"
+           stop-color="rgb(34, 94, 168)"
+           stop-opacity="1"
+           id="stop7" />
+        <stop
+           offset="37.5%"
+           stop-color="rgb(29, 145, 192)"
+           stop-opacity="1"
+           id="stop8" />
+        <stop
+           offset="50%"
+           stop-color="rgb(65, 182, 196)"
+           stop-opacity="1"
+           id="stop9" />
+        <stop
+           offset="62.5%"
+           stop-color="rgb(127, 205, 187)"
+           stop-opacity="1"
+           id="stop10" />
+        <stop
+           offset="75%"
+           stop-color="rgb(199, 233, 180)"
+           stop-opacity="1"
+           id="stop11" />
+        <stop
+           offset="87.5%"
+           stop-color="rgb(237, 248, 177)"
+           stop-opacity="1"
+           id="stop12" />
+        <stop
+           offset="100%"
+           stop-color="rgb(255, 255, 217)"
+           stop-opacity="1"
+           id="stop13" />
+      </linearGradient>
+    </g>
+    <g
+       class="patterns"
+       id="g14" />
+  </defs>
+  <g
+     class="bglayer"
+     id="g15">
+    <rect
+       class="bg"
+       x="75"
+       y="160"
+       width="325"
+       height="617"
+       style="fill: rgb(246, 245, 244); fill-opacity: 1; stroke-width: 0;"
+       id="rect14" />
+  </g>
+  <g
+     class="layer-below"
+     id="g18">
+    <g
+       class="imagelayer"
+       id="g16" />
+    <g
+       class="shapelayer"
+       id="g17" />
+  </g>
+  <g
+     class="cartesianlayer"
+     id="g213">
+    <g
+       class="subplot xy"
+       id="g212">
+      <g
+         class="layer-subplot"
+         id="g21">
+        <g
+           class="shapelayer"
+           id="g19" />
+        <g
+           class="imagelayer"
+           id="g20" />
+      </g>
+      <g
+         class="minor-gridlayer"
+         id="g24">
+        <g
+           class="x"
+           id="g22" />
+        <g
+           class="y"
+           id="g23" />
+      </g>
+      <g
+         class="gridlayer"
+         id="g27">
+        <g
+           class="x"
+           id="g25" />
+        <g
+           class="y"
+           id="g26" />
+      </g>
+      <g
+         class="zerolinelayer"
+         id="g28" />
+      <g
+         class="layer-between"
+         id="g31">
+        <g
+           class="shapelayer"
+           id="g29" />
+        <g
+           class="imagelayer"
+           id="g30" />
+      </g>
+      <path
+         class="xlines-below"
+         id="path31" />
+      <path
+         class="ylines-below"
+         id="path32" />
+      <g
+         class="overlines-below"
+         id="g32" />
+      <g
+         class="xaxislayer-below"
+         id="g33" />
+      <g
+         class="yaxislayer-below"
+         id="g34" />
+      <g
+         class="overaxes-below"
+         id="g35" />
+      <g
+         class="overplot"
+         id="g133">
+        <g
+           class="xy"
+           transform="translate(75,160)"
+           clip-path="url(#clip55b34bxyplot)"
+           id="g132">
+          <g
+             class="heatmaplayer mlayer"
+             id="g131">
+            <g
+               class="hm"
+               id="g130">
+              <image
+                 preserveAspectRatio="none"
+                 height="617"
+                 width="325"
+                 x="0"
+                 y="0"
+                 xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAUCAYAAAC58NwRAAABM0lEQVQ4T+2SPUvDUBSG35Ov5UoDri6CSKDgoINTKoqCFtFRnJx08B/o4qCTo6Cgv8EtoFirqKWbgoMS6aBdiqPDlYDENEduINWiKWT3Tnd4n3Pf83AJOQ/lzKMnwNzgdCCRk2QzgSh+4MOnV7QZWHUEhOn2BrKq0tRpnZcGA6wXZ3+9FnzWWJUQZolkeMkFa5oo7ak6LlRrXLRD7I7PJPCL9FgjYOPWxtaoxOadjQRIF/p5z6yUG1CTDvwKHzcFruddagUer9z0w9AY53Olzl57jxVec8TfWidP6mxowEXZJaXX0EY6YJelpvTY0oEBsZgE3sMrJiKYmsBH9AZLt79fUAqFOdGlNo59VgmCDuY2iPR/IJ8l5X3nvsrDhQjLQ+Xkj521nmEQ46jRh+0xiX1f4AsU2cAUpMch2wAAAABJRU5ErkJggg=="
+                 style="image-rendering: pixelated; opacity: 1;"
+                 id="image35" />
+              <g
+                 class="heatmap-label"
+                 id="g36">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="95"
+                   y="606.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text35">0.4</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g37">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="122"
+                   y="606.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text36">0.3</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g38">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="176"
+                   y="606.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text37">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g39">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="203"
+                   y="606.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text38">0.3</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g40">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="230"
+                   y="606.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text39">0.3</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g41">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="257"
+                   y="606.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text40">0.5</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g42">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="284"
+                   y="606.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text41">0.2</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g43">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="311"
+                   y="606.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text42">0.4</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g44">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="68"
+                   y="575.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text43">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g45">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="203"
+                   y="575.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text44">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g46">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="230"
+                   y="575.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text45">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g47">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="257"
+                   y="575.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text46">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g48">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="284"
+                   y="575.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text47">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g49">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="311"
+                   y="575.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text48">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g50">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="68"
+                   y="544.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text49">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g51">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="203"
+                   y="544.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text50">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g52">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="230"
+                   y="544.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text51">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g53">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="257"
+                   y="544.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text52">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g54">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="284"
+                   y="544.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text53">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g55">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="311"
+                   y="544.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text54">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g56">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="68"
+                   y="513.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text55">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g57">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="203"
+                   y="513.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text56">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g58">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="230"
+                   y="513.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text57">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g59">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="257"
+                   y="513.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text58">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g60">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="284"
+                   y="513.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text59">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g61">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="311"
+                   y="513.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text60">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g62">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="68"
+                   y="482.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text61">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g63">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="203"
+                   y="482.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text62">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g64">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="230"
+                   y="482.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text63">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g65">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="257"
+                   y="482.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text64">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g66">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="284"
+                   y="482.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text65">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g67">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="311"
+                   y="482.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text66">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g68">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="68"
+                   y="451.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text67">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g69">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="203"
+                   y="451.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text68">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g70">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="230"
+                   y="451.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text69">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g71">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="257"
+                   y="451.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text70">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g72">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="284"
+                   y="451.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text71">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g73">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="311"
+                   y="451.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text72">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g74">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="68"
+                   y="420.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text73">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g75">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="203"
+                   y="420.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text74">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g76">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="230"
+                   y="420.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text75">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g77">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="257"
+                   y="420.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text76">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g78">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="284"
+                   y="420.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text77">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g79">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="311"
+                   y="420.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text78">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g80">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="68"
+                   y="390.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text79">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g81">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="203"
+                   y="390.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text80">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g82">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="230"
+                   y="390.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text81">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g83">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="257"
+                   y="390.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text82">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g84">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="284"
+                   y="390.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text83">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g85">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="311"
+                   y="390.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text84">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g86">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="14"
+                   y="359.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text85">0.5</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g87">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="41"
+                   y="359.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text86">0.3</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g88">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="95"
+                   y="359.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text87">0.2</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g89">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="122"
+                   y="359.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text88">0.2</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g90">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="203"
+                   y="359.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text89">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g91">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="230"
+                   y="359.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text90">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g92">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="257"
+                   y="359.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text91">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g93">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="284"
+                   y="359.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text92">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g94">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="311"
+                   y="359.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text93">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g95">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="149"
+                   y="328.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text94">0.5</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g96">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="176"
+                   y="328.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text95">0.5</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g97">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="230"
+                   y="328.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text96">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g98">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="41"
+                   y="297.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text97">0.3</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g99">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="68"
+                   y="297.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text98">0.5</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g100">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="122"
+                   y="297.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text99">0.2</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g101">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="149"
+                   y="297.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text100">0.5</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g102">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="176"
+                   y="297.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text101">0.5</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g103">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="284"
+                   y="297.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text102">0.3</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g104">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="311"
+                   y="297.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text103">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g105">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="14"
+                   y="266.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text104">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g106">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="95"
+                   y="266.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text105">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g107">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="14"
+                   y="235.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text106">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g108">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="95"
+                   y="235.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text107">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g109">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="14"
+                   y="205.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text108">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g110">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="41"
+                   y="205.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text109">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g111">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="95"
+                   y="205.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text110">0.5</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g112">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="122"
+                   y="205.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text111">0.4</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g113">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="203"
+                   y="205.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text112">0.2</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g114">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="230"
+                   y="205.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text113">0.2</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g115">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="257"
+                   y="205.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text114">0.5</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g116">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="284"
+                   y="205.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text115">0.2</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g117">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="311"
+                   y="205.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text116">0.5</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g118">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="14"
+                   y="174.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text117">0.5</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g119">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="41"
+                   y="174.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text118">0.3</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g120">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="203"
+                   y="174.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text119">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g121">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="230"
+                   y="174.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text120">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g122">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="284"
+                   y="174.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text121">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g123">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="176"
+                   y="112.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text122">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g124">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="203"
+                   y="112.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text123">0.3</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g125">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="230"
+                   y="112.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text124">0.3</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g126">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="257"
+                   y="112.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text125">0.1</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g127">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="203"
+                   y="81.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text126">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g128">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="230"
+                   y="81.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text127">0.0</text>
+              </g>
+              <g
+                 class="heatmap-label"
+                 id="g129">
+                <text
+                   text-anchor="middle"
+                   data-notex="1"
+                   x="257"
+                   y="81.9"
+                   style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(68, 68, 68); fill-opacity: 1; white-space: pre;"
+                   id="text128">0.0</text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+      <path
+         class="xlines-above crisp"
+         d="M0,0"
+         style="fill: none;"
+         id="path133" />
+      <path
+         class="ylines-above crisp"
+         d="M0,0"
+         style="fill: none;"
+         id="path134" />
+      <g
+         class="overlines-above"
+         id="g134" />
+      <g
+         class="xaxislayer-above"
+         id="g158">
+        <g
+           class="xtick"
+           id="g135">
+          <text
+             text-anchor="end"
+             x="0"
+             y="156"
+             transform="translate(88.53999999999999,0) rotate(90,0,148.5)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text134"><tspan
+               style="font-weight:bold"
+               id="tspan134">GOR</tspan></text>
+        </g>
+        <g
+           class="xtick"
+           id="g136">
+          <text
+             text-anchor="end"
+             x="0"
+             y="156"
+             transform="translate(115.63,0) rotate(90,0,148.5)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text135"><tspan
+               style="font-weight:bold"
+               id="tspan135">STEC</tspan></text>
+        </g>
+        <g
+           class="xtick"
+           id="g137">
+          <text
+             text-anchor="end"
+             x="0"
+             y="156"
+             transform="translate(142.70999999999998,0) rotate(90,0,148.5)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text136"><tspan
+               style="font-weight:bold"
+               id="tspan136">SEEC</tspan></text>
+        </g>
+        <g
+           class="xtick"
+           id="g139">
+          <text
+             text-anchor="end"
+             x="0"
+             y="156"
+             transform="translate(169.79000000000002,0) rotate(90,0,148.5)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text139"><tspan
+               style="font-weight:bold"
+               id="tspan139">GOR​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan137">wh</tspan><tspan
+   dy="-0.21em"
+   id="tspan138">​</tspan></tspan></text>
+        </g>
+        <g
+           class="xtick"
+           id="g142">
+          <text
+             text-anchor="end"
+             x="0"
+             y="156"
+             transform="translate(196.88,0) rotate(90,0,148.5)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text142"><tspan
+               style="font-weight:bold"
+               id="tspan142">STEC​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan140">wh</tspan><tspan
+   dy="-0.21em"
+   id="tspan141">​</tspan></tspan></text>
+        </g>
+        <g
+           class="xtick"
+           id="g143">
+          <text
+             text-anchor="end"
+             x="0"
+             y="156"
+             transform="translate(223.96,0) rotate(90,0,148.5)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text143"><tspan
+               style="font-weight:bold"
+               id="tspan143">RR</tspan></text>
+        </g>
+        <g
+           class="xtick"
+           id="g144">
+          <text
+             text-anchor="end"
+             x="0"
+             y="156"
+             transform="translate(251.04,0) rotate(90,0,148.5)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text144"><tspan
+               style="font-weight:bold"
+               id="tspan144">RI</tspan></text>
+        </g>
+        <g
+           class="xtick"
+           id="g147">
+          <text
+             text-anchor="end"
+             x="0"
+             y="156"
+             transform="translate(278.12,0) rotate(90,0,148.5)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text147"><tspan
+               style="font-weight:bold"
+               id="tspan147">η​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan145">II</tspan><tspan
+   dy="-0.21em"
+   id="tspan146">​</tspan></tspan></text>
+        </g>
+        <g
+           class="xtick"
+           id="g150">
+          <text
+             text-anchor="end"
+             x="0"
+             y="156"
+             transform="translate(305.21000000000004,0) rotate(90,0,148.5)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text150"><tspan
+               style="font-weight:bold"
+               id="tspan150">η​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan148">II,bc</tspan><tspan
+   dy="-0.21em"
+   id="tspan149">​</tspan></tspan></text>
+        </g>
+        <g
+           class="xtick"
+           id="g153">
+          <text
+             text-anchor="end"
+             x="0"
+             y="156"
+             transform="translate(332.29,0) rotate(90,0,148.5)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text153"><tspan
+               style="font-weight:bold"
+               id="tspan153">η​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan151">II,wh</tspan><tspan
+   dy="-0.21em"
+   id="tspan152">​</tspan></tspan></text>
+        </g>
+        <g
+           class="xtick"
+           id="g154">
+          <text
+             text-anchor="end"
+             x="0"
+             y="156"
+             transform="translate(359.38,0) rotate(90,0,148.5)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text154"><tspan
+               style="font-weight:bold"
+               id="tspan154">SEXC</tspan></text>
+        </g>
+        <g
+           class="xtick"
+           id="g157">
+          <text
+             text-anchor="end"
+             x="0"
+             y="156"
+             transform="translate(386.46,0) rotate(90,0,148.5)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text157"><tspan
+               style="font-weight:bold"
+               id="tspan157">SEXC​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan155">wh</tspan><tspan
+   dy="-0.21em"
+   id="tspan156">​</tspan></tspan></text>
+        </g>
+      </g>
+      <g
+         class="yaxislayer-above"
+         id="g210">
+        <g
+           class="ytick"
+           id="g159">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,761.58)"
+             style="font-family:'Open Sans', verdana, arial, sans-serif;font-size:11.33333334px;fill:rgb(42, 63, 95);fill-opacity:1;font-weight:normal;white-space:pre;opacity:1;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+             id="text159">T​<tspan
+   style="font-size:11.33333334px;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   dy="0.3em"
+   id="tspan158">c,in</tspan><tspan
+   dy="-0.21em"
+   id="tspan159"
+   style="-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:11.33333334px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">​</tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g161">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,730.73)"
+             style="font-family:'Open Sans', verdana, arial, sans-serif;font-size:11.33333334px;fill:rgb(42, 63, 95);fill-opacity:1;font-weight:normal;white-space:pre;opacity:1;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+             id="text161">J​<tspan
+   style="font-size:11.33333334px;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   dy="0.3em"
+   id="tspan160">sw</tspan><tspan
+   dy="-0.21em"
+   id="tspan161"
+   style="-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:11.33333334px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">​</tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g163">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,699.88)"
+             style="font-family:'Open Sans', verdana, arial, sans-serif;font-size:11.33333334px;fill:rgb(42, 63, 95);fill-opacity:1;font-weight:normal;white-space:pre;opacity:1;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+             id="text163">J​<tspan
+   style="font-size:11.33333334px;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   dy="0.3em"
+   id="tspan162">b</tspan><tspan
+   dy="-0.21em"
+   id="tspan163"
+   style="-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:11.33333334px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">​</tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g165">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,669.03)"
+             style="font-family:'Open Sans', verdana, arial, sans-serif;font-size:11.33333334px;fill:rgb(42, 63, 95);fill-opacity:1;font-weight:normal;white-space:pre;opacity:1;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+             id="text165">J​<tspan
+   style="font-size:11.33333334px;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   dy="0.3em"
+   id="tspan164">d</tspan><tspan
+   dy="-0.21em"
+   id="tspan165"
+   style="-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:11.33333334px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">​</tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g167">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,638.1800000000001)"
+             style="font-family:'Open Sans', verdana, arial, sans-serif;font-size:11.33333334px;fill:rgb(42, 63, 95);fill-opacity:1;font-weight:normal;white-space:pre;opacity:1;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+             id="text167">J​<tspan
+   style="font-size:11.33333334px;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   dy="0.3em"
+   id="tspan166">s</tspan><tspan
+   dy="-0.21em"
+   id="tspan167"
+   style="-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:11.33333334px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">​</tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g169">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,607.3299999999999)"
+             style="font-family:'Open Sans', verdana, arial, sans-serif;font-size:11.33333334px;fill:rgb(42, 63, 95);fill-opacity:1;font-weight:normal;white-space:pre;opacity:1;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+             id="text169">J​<tspan
+   style="font-size:11.33333334px;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   dy="0.3em"
+   id="tspan168">f</tspan><tspan
+   dy="-0.21em"
+   id="tspan169"
+   style="-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:11.33333334px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">​</tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g171">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,576.48)"
+             style="font-family:'Open Sans', verdana, arial, sans-serif;font-size:11.33333334px;fill:rgb(42, 63, 95);fill-opacity:1;font-weight:normal;white-space:pre;opacity:1;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+             id="text171">J​<tspan
+   style="font-size:11.33333334px;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   dy="0.3em"
+   id="tspan170">vacuum</tspan><tspan
+   dy="-0.21em"
+   id="tspan171"
+   style="-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:11.33333334px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">​</tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g173">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,545.63)"
+             style="font-family:'Open Sans', verdana, arial, sans-serif;font-size:11.33333334px;fill:rgb(42, 63, 95);fill-opacity:1;font-weight:normal;white-space:pre;opacity:1;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+             id="text173">J​<tspan
+   style="font-size:11.33333334px;-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   dy="0.3em"
+   id="tspan172">aux</tspan><tspan
+   dy="-0.21em"
+   id="tspan173"
+   style="-inkscape-font-specification:'Open Sans, verdana, arial, sans-serif, Normal';font-family:'Open Sans', verdana, arial, sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:11.33333334px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">​</tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g176">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,514.78)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text176"><tspan
+               style="font-weight:bold"
+               id="tspan176">q​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan174">s</tspan><tspan
+   dy="-0.21em"
+   id="tspan175">​</tspan></tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g179">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,483.93)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text179"><tspan
+               style="font-weight:bold"
+               id="tspan179">q​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan177">f</tspan><tspan
+   dy="-0.21em"
+   id="tspan178">​</tspan></tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g182">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,453.08)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text182"><tspan
+               style="font-weight:bold"
+               id="tspan182">q​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan180">d</tspan><tspan
+   dy="-0.21em"
+   id="tspan181">​</tspan></tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g185">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,422.23)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text185"><tspan
+               style="font-weight:bold"
+               id="tspan185">P​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan183">vc</tspan><tspan
+   dy="-0.21em"
+   id="tspan184">​</tspan></tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g188">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,391.38)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text188"><tspan
+               style="font-weight:bold"
+               id="tspan188">P​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan186">v1</tspan><tspan
+   dy="-0.21em"
+   id="tspan187">​</tspan></tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g191">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,360.53)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text191"><tspan
+               style="font-weight:bold"
+               id="tspan191">T​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan189">s,in</tspan><tspan
+   dy="-0.21em"
+   id="tspan190">​</tspan></tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g194">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,329.68)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text194"><tspan
+               style="font-weight:bold"
+               id="tspan194">ΔT​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan192">s</tspan><tspan
+   dy="-0.21em"
+   id="tspan193">​</tspan></tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g197">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,298.83000000000004)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text197"><tspan
+               style="font-weight:bold"
+               id="tspan197">T​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan195">amb</tspan><tspan
+   dy="-0.21em"
+   id="tspan196">​</tspan></tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g200">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,267.98)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text200"><tspan
+               style="font-weight:bold"
+               id="tspan200">w​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan198">f</tspan><tspan
+   dy="-0.21em"
+   id="tspan199">​</tspan></tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g203">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,237.13)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text203"><tspan
+               style="font-weight:bold"
+               id="tspan203">w​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan201">d</tspan><tspan
+   dy="-0.21em"
+   id="tspan202">​</tspan></tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g206">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,206.27)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text206"><tspan
+               style="font-weight:bold"
+               id="tspan206">L​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan204">d</tspan><tspan
+   dy="-0.21em"
+   id="tspan205">​</tspan></tspan></text>
+        </g>
+        <g
+           class="ytick"
+           id="g209">
+          <text
+             text-anchor="end"
+             x="74"
+             y="5.25"
+             transform="translate(0,175.43)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 15px; fill: rgb(42, 63, 95); fill-opacity: 1; font-weight: bold; white-space: pre; opacity: 1;"
+             id="text209"><tspan
+               style="font-weight:bold"
+               id="tspan209">L​<tspan
+   style="font-size:70%"
+   dy="0.3em"
+   id="tspan207">b</tspan><tspan
+   dy="-0.21em"
+   id="tspan208">​</tspan></tspan></text>
+        </g>
+      </g>
+      <g
+         class="overaxes-above"
+         id="g211" />
+    </g>
+  </g>
+  <g
+     class="polarlayer"
+     id="g214" />
+  <g
+     class="smithlayer"
+     id="g215" />
+  <g
+     class="ternarylayer"
+     id="g216" />
+  <g
+     class="geolayer"
+     id="g217" />
+  <g
+     class="funnelarealayer"
+     id="g218" />
+  <g
+     class="pielayer"
+     id="g219" />
+  <g
+     class="iciclelayer"
+     id="g220" />
+  <g
+     class="treemaplayer"
+     id="g221" />
+  <g
+     class="sunburstlayer"
+     id="g222" />
+  <g
+     class="glimages"
+     id="g223" />
+  <defs
+     id="topdefs-55b34b">
+    <g
+       class="clips"
+       id="g224" />
+  </defs>
+  <g
+     class="layer-above"
+     id="g227">
+    <g
+       class="imagelayer"
+       id="g225" />
+    <g
+       class="shapelayer"
+       id="g226" />
+  </g>
+  <g
+     class="infolayer"
+     id="g240">
+    <g
+       class="cb78ccec colorbar"
+       transform="translate(75,92.984375)"
+       id="g236">
+      <rect
+         class="cbbg"
+         x="0"
+         y="740"
+         height="67.015625"
+         width="325"
+         style="fill: rgb(0, 0, 0); fill-opacity: 0; stroke: rgb(68, 68, 68); stroke-opacity: 1; stroke-width: 0;"
+         id="rect227" />
+      <g
+         class="cbfills"
+         transform="translate(123,0)"
+         id="g228">
+        <rect
+           class="cbfill gradient_filled"
+           style="fill: url('#g55b34b-cb78ccec');"
+           y="750"
+           x="0"
+           height="30"
+           width="192"
+           id="rect228" />
+      </g>
+      <g
+         class="cblines"
+         transform="translate(123,0)"
+         id="g229" />
+      <g
+         class="cbaxis crisp"
+         transform="translate(-75,0)"
+         id="g233">
+        <g
+           class="xcb78ccectick"
+           id="g230">
+          <text
+             text-anchor="middle"
+             x="0"
+             y="794.9"
+             transform="translate(197.609375,0)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             id="text229">0</text>
+        </g>
+        <g
+           class="xcb78ccectick"
+           id="g231">
+          <text
+             text-anchor="middle"
+             x="0"
+             y="794.9"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             transform="translate(293.809375,0)"
+             id="text230">0.5</text>
+        </g>
+        <g
+           class="xcb78ccectick"
+           id="g232">
+          <text
+             text-anchor="middle"
+             x="0"
+             y="794.9"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             transform="translate(389.999375,0)"
+             id="text231">1</text>
+        </g>
+      </g>
+      <g
+         class="cbtitleunshift"
+         transform="translate(-75,-160)"
+         id="g235">
+        <g
+           class="cbtitle"
+           transform=""
+           id="g234">
+          <text
+             class="xcb78ccectitle"
+             x="85"
+             y="923.9"
+             text-anchor="middle"
+             style="opacity: 1; font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre;"
+             transform="translate(38.5703125,0)"
+             id="text233">Sensitivity index</text>
+        </g>
+      </g>
+      <rect
+         class="cboutline"
+         x="126.28125"
+         y="750"
+         height="30"
+         width="188.71875"
+         style="stroke: rgb(68, 68, 68); stroke-opacity: 1; fill: none; stroke-width: 0;"
+         id="rect235" />
+    </g>
+    <g
+       class="g-gtitle"
+       id="g237" />
+    <g
+       class="g-xtitle"
+       id="g238">
+      <text
+         class="xtitle"
+         x="237.5"
+         y="76.975"
+         text-anchor="middle"
+         style="opacity: 1; font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre;"
+         id="text237">Metrics</text>
+    </g>
+    <g
+       class="g-ytitle"
+       transform="translate(9.197265625,0)"
+       id="g239">
+      <text
+         class="ytitle"
+         transform="rotate(-90,5.803124999999994,468.5)"
+         x="5.803124999999994"
+         y="468.5"
+         text-anchor="middle"
+         style="opacity: 1; font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre;"
+         id="text238">Variables</text>
+    </g>
+  </g>
+</svg>
