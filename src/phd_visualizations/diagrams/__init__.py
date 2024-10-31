@@ -1,11 +1,12 @@
-import math
+import base64
 from lxml import etree
+from copy import deepcopy
+from typing import Literal
+from loguru import logger
 # import os
 # import logging
-import base64
-# from loguru import logger
 # from pathlib import Path
-# from typing import Literal
+from . import utils
 
 """ Global variables """
 
@@ -19,25 +20,18 @@ nsmap = {
     'inkscape': 'http://www.inkscape.org/namespaces/inkscape'
 }
 
-# Diagram generation auxiliary functions
-def round_to_nonzero_decimal(n):
-    if n == 0:
-        return 0
-    sgn = -1 if n < 0 else 1
-    scale = int(-math.floor(math.log10(abs(n))))
-    if scale <= 0:
-        scale = 1
-    factor = 10 ** scale
-    return sgn * math.floor(abs(n) * factor) / factor
 
-
-def convert_to_float_if_possible(value):
-    try:
-        converted_value = float(value)
-        return converted_value
-    except ValueError:
-        return value
-
+def find_object(object_id: str, diagram: etree._ElementTree, group: bool = False) -> etree.ElementBase:
+    
+    if not group:
+        object = diagram.xpath(f'//svg:g[@id="cell-{object_id}"]', namespaces=nsmap)
+    else:
+        object = diagram.xpath(f'//svg:g[starts-with(@id, "cell-{object_id}")]', namespaces=nsmap)
+    
+    if not object:
+        raise ValueError(f'Object {object_id} not found in diagram')
+    else:
+        return object
 
 def change_text(diagram, object_id, new_text):
     obj = diagram.xpath(f'//svg:g[@id="cell-{object_id}"]', namespaces=nsmap)
@@ -50,10 +44,6 @@ def change_text(diagram, object_id, new_text):
                     break
 
     return diagram
-
-
-def get_y(x, xmin, xmax, ymin, ymax):
-    return ((ymax - ymin) / (xmax - xmin)) * (x - xmin) + ymin
 
 
 def adjust_icon(id, size, tag, value, unit, include_boundary=True, max_size=None, max_value=None):
@@ -88,7 +78,7 @@ def adjust_icon(id, size, tag, value, unit, include_boundary=True, max_size=None
                     elif isinstance(value, int):
                         child2.text = f'{value} {unit}'
                     else:
-                        child2.text = f'{round_to_nonzero_decimal(value)} {unit}'
+                        child2.text = f'{utils.round_to_nonzero_decimal(value)} {unit}'
 
     # Add boundary circle
     if include_boundary:
@@ -151,3 +141,107 @@ def update_image(diagram, image_path, object_id):
             child.set('{http://www.w3.org/1999/xlink}href', dataurl)
 
     return diagram
+
+    
+def change_bg_color(object: etree._Element, color: str, not_inplace:bool = False, tag_key: Literal['rect', 'path'] = 'rect'):
+    
+    centinela = False
+    
+    def change_color(child):
+        
+        if tag_key in child.tag:
+            logger.debug(f'Changing fill color of {child.get("id")} to {color}')
+            child.set('fill', color)
+            
+            nonlocal centinela
+            centinela = True
+            
+            return
+        
+        elif len(child) > 0:
+                for child_ in child:
+                    change_color(child_)
+            
+    if not_inplace:
+        object = deepcopy(object)
+            
+    for child in object:
+        change_color(child)
+        
+    if not centinela:
+        logger.error('Could not find any path object to change its fill color')
+        
+    return object if not_inplace else None
+    
+def change_line_width(object_id:str, diagram: etree._ElementTree, width: int, not_inplace:bool = False, tag_key: Literal['rect', 'path'] = 'path', group:bool=False, stop_on_first_change=False) -> etree.ElementBase | None:
+    
+    centinela = False
+    
+    def change_width(child):
+        
+        if tag_key in child.tag:
+            logger.debug(f'Changing width of {object_id}/{child.get("id")} to {width}')
+            child.set('stroke-width', str(width))
+            
+            nonlocal centinela
+            centinela = True
+            
+            if stop_on_first_change:
+                return
+        
+        elif len(child) > 0:
+                for child_ in child:
+                    change_width(child_)
+            
+    if not_inplace:
+        diagram = deepcopy(diagram)
+            
+    object = find_object(object_id, diagram, group=group)
+            
+    for child in object:
+        # if centinela and stop_on_first_change:
+        #     break
+        
+        change_width(child)
+        
+    if not centinela:
+        logger.error(f'Could not find any {tag_key} object to change its width in {object_id}')
+        
+    return diagram if not_inplace else None
+
+
+def change_line_color(object_id:str, diagram: etree._ElementTree, color: str, not_inplace:bool = False, tag_key: Literal['rect', 'path'] = 'path', group:bool=False, stop_on_first_change=False) -> etree.ElementBase | None:
+    
+    centinela = False
+    
+    def change_property(child):
+        
+        if tag_key in child.tag:
+            logger.debug(f'Changing color of {object_id}/{child.get("id")} to {color}')
+            child.set('stroke', str(color))
+            
+            nonlocal centinela
+            centinela = True
+            
+            if stop_on_first_change:
+                return
+        
+        elif len(child) > 0:
+                for child_ in child:
+                    change_property(child_)
+            
+    if not_inplace:
+        diagram = deepcopy(diagram)
+            
+    object = find_object(object_id, diagram, group=group)
+            
+    for child in object:
+        # if centinela and stop_on_first_change:
+        #     break
+        
+        change_property(child)
+        
+    if not centinela:
+        logger.error(f'Could not find any {tag_key} object to change its width in {object_id}')
+        
+    return diagram if not_inplace else None
