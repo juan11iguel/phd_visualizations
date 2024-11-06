@@ -39,6 +39,13 @@ Timeseries signals
 
 ![](assets/pareto_evolution_wascop.gif)
 
+### Finite state machines
+
+Finite state machine evolution 
+
+[Interactive version](assets/MED_FSM_test_state_evolution.html)
+![](assets/MED_FSM_test_state_evolution.png)
+
 
 # TODO
 - [ ] Add path explorer gif
