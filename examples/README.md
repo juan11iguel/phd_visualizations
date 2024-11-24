@@ -48,8 +48,8 @@ Finite state machine evolution
 
 ### Optimization cycle animation
 
-![assets/optim_cycle_time_anim.gif]
-![assets/optim_cycle_samples_anim.gif]
+![](assets/optim_cycle_time_anim.gif)
+![](assets/optim_cycle_samples_anim.gif)
 
 
 # TODO
