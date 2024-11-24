@@ -46,6 +46,11 @@ Finite state machine evolution
 [Interactive version](assets/MED_FSM_test_state_evolution.html)
 ![](assets/MED_FSM_test_state_evolution.png)
 
+### Optimization cycle animation
+
+![assets/optim_cycle_time_anim.gif]
+![assets/optim_cycle_samples_anim.gif]
+
 
 # TODO
 - [ ] Add path explorer gif
