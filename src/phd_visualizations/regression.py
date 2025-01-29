@@ -1,7 +1,6 @@
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 import numpy as np
 from phd_visualizations.calculations import calculate_uncertainty, SupportedInstruments

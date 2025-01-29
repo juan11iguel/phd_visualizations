@@ -13,6 +13,7 @@ dependencies = [
     "pandas>=2.2.2",
     "pillow>=11.0.0",
     "plotly>=5.24.0",
+    "scikit-learn>=1.6.1",
 ]
 
 [build-system]
