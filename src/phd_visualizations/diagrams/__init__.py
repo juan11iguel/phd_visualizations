@@ -3,6 +3,7 @@ from lxml import etree
 from copy import deepcopy
 from typing import Literal
 from loguru import logger
+import warnings
 # import os
 # import logging
 # from pathlib import Path
@@ -33,20 +34,103 @@ def find_object(object_id: str, diagram: etree._ElementTree, group: bool = False
     else:
         return object
 
-def change_text(diagram, object_id, new_text):
-    obj = diagram.xpath(f'//svg:g[@id="cell-{object_id}"]', namespaces=nsmap)
-
-    for child in obj[0]:
+def change_text(object_id, diagram, new_text: str, not_inplace: bool = False) -> etree.ElementBase | None:
+    
+    centinela = False
+    
+    def update_text(child):
         if child.tag.endswith('g'):
-            for child2 in child:
-                if child2.tag.endswith('text'):
-                    child2.text = new_text
-                    break
+           for child_ in child:
+                update_text(child_)
+        elif child.tag.endswith('text'):
+            logger.debug(f'Changing text of {object_id}/{child.get("id")} to {new_text}')
+            child.text = new_text
+            
+            nonlocal centinela
+            centinela = True
+            
+            return # Exit on first match
+        # Recursive call
+        elif len(child) > 0:
+            for child_ in child:
+                update_text(child_)
+        
+    if not_inplace:
+        diagram = copy.deepcopy(diagram)
+    object = find_object(object_id, diagram, group=False)
+    for child in object:        
+        update_text(child)
+    
+    if not centinela:
+        logger.error(f'Could not find any text object in {object_id}')
+    
+    return diagram if not_inplace else None
 
-    return diagram
+def change_icon(object_id:str, diagram: etree._ElementTree, size: int, text: str = None, 
+                max_size: int = None, max_value: int | float = None, include_boundary:bool=False,
+                not_inplace:bool = False, group:bool=False) -> etree.ElementBase | None:
+    
+    if include_boundary:
+        assert max_size is not None and max_value is not None, "max_size and max_value must be provided if include_boundary is True"
+    
+    centinela = False
+    
+    def change_size(child):
+        if "image" in child.tag:
+            logger.debug(f'Changing size of {object_id}/{child.get("id")} to {size}')
+            pos_x = child.get("x");
+            pos_y = child.get("y")
+            current_size = float(child.get("width"))
+            delta_size = size - current_size
+
+            child.set("width", str(size))
+            child.set("height", str(size))
+
+            pos_x = float(pos_x) - delta_size / 2
+            pos_y = float(pos_y) - delta_size / 2
+
+            child.set("x", str(pos_x))
+            child.set("y", str(pos_y))
+
+            # Add template-id property to be used later ??
+            child.set("template-id", f'icon-{object_id}')
+            
+            # Add boundary circle
+            if include_boundary:
+                object[0][0].addprevious(etree.fromstring(utils.generate_boundary_circle(object_id, size, max_size, max_value, pos_x, pos_y)))
+            
+            nonlocal centinela
+            centinela = True
+            
+            return # Exit on first match
+        
+        # Recursive call
+        elif len(child) > 0:
+            for child_ in child:
+                change_size(child_)
+            
+    if not_inplace:
+        diagram = copy.deepcopy(diagram)
+            
+    object = find_object(object_id, diagram, group=group)
+            
+    if text is not None:
+        change_text(object_id, diagram, text, not_inplace=False)
+    
+    # Change icon size and add boundary circle
+    for child in object:        
+        change_size(child)
+    if not centinela:
+        logger.error(f'Could not find any icon object in {object_id}')
+        
+        
+    return diagram if not_inplace else None
 
 
 def adjust_icon(id, size, tag, value, unit, include_boundary=True, max_size=None, max_value=None):
+    
+    warnings.warn("This function is deprecated. Use change_icon instead", DeprecationWarning)
+    
     if unit == 'degree_celsius': unit = '⁰C'
 
     for child in tag[0]:
@@ -82,20 +166,9 @@ def adjust_icon(id, size, tag, value, unit, include_boundary=True, max_size=None
 
     # Add boundary circle
     if include_boundary:
-        tag[0][0].addprevious(etree.fromstring(generate_boundary_circle(id, size, max_size, max_value, pos_x, pos_y)))
+        tag[0][0].addprevious(etree.fromstring(utils.generate_boundary_circle(id, size, max_size, max_value, pos_x, pos_y)))
+        
     return tag, pos_x, pos_y
-
-
-def generate_boundary_circle(id, size_icon, size_boundary, max_value, pos_x, pos_y):
-    x = pos_x + size_icon / 2
-    y = pos_y + size_icon / 2
-
-    return f"""
-    <g id="boundary-{id}">
-        <ellipse cx="{x}" cy="{y}" rx="{size_boundary / 2}" ry="{size_boundary / 2}" fill-opacity="0" fill="rgb(255, 255, 255)" stroke="#ececec" stroke-dasharray="3 3" pointer-events="all"/>
-        <g fill="#ECECEC" font-family="Helvetica" font-size="10px">
-        <text x="{x + size_boundary / 2}" y="{y}">{max_value:.0f}</text></g></g>
-    """
 
 
 def get_level(value, min_value, max_value):

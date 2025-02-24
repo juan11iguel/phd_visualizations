@@ -23,3 +23,15 @@ def convert_to_float_if_possible(value):
     
 def get_y(x, xmin, xmax, ymin, ymax):
     return ((ymax - ymin) / (xmax - xmin)) * (x - xmin) + ymin
+
+
+def generate_boundary_circle(id, size_icon, size_boundary, max_value, pos_x, pos_y) -> str:
+    x = pos_x + size_icon / 2
+    y = pos_y + size_icon / 2
+
+    return f"""
+    <g id="boundary-{id}">
+        <ellipse cx="{x}" cy="{y}" rx="{size_boundary / 2}" ry="{size_boundary / 2}" fill-opacity="0" fill="rgb(255, 255, 255)" stroke="#ececec" stroke-dasharray="3 3" pointer-events="all"/>
+        <g fill="#ECECEC" font-family="Helvetica" font-size="10px">
+        <text x="{x + size_boundary / 2}" y="{y}">{max_value:.0f}</text></g></g>
+    """
