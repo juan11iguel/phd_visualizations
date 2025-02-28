@@ -738,6 +738,8 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
             )
         
         for trace_conf in conf['traces_left']:
+            
+            ylims_left = conf.get('ylims_left', None)
 
             if '*' in trace_conf['var_id']:
                 # Validation
@@ -811,11 +813,14 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                                 legend_id=plot_id,)
 
         # Manually set range for left axis, for some reason it does not work correctly automatically
-        if conf.get('ylims_left', None) == 'manual':
+        min_y = min_y - padding
+        if ylims_left == "manual_from_zero":
+            min_y = 0
+        if ylims_left == 'manual':
             padding = (max_y - min_y) * 0.1  # Creo que lo hice mejor en webscada, revisar
-            yaxes_settings[f'yaxis{axes_idx}']['range'] = [min_y - padding, max_y + padding]
+            yaxes_settings[f'yaxis{axes_idx}']['range'] = [min_y, max_y + padding]
 
-        elif isinstance(conf.get('ylims_left', None), list):
+        elif isinstance(ylims_left, list):
             yaxes_settings[f'yaxis{axes_idx}']['range'] = [conf['ylims_left'][0], conf['ylims_left'][1]]
 
         # logger.debug(f'Left axis range: {yaxes_settings[f"yaxis{axes_idx}"]["range"]}')
