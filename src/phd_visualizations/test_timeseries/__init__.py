@@ -14,9 +14,9 @@ import re
 import plotly
 import plotly.graph_objects as go
 from loguru import logger
-from .constants import color_palette, default_fontsize, newshape_style, ArrayLike, named_css_colors
-from .calculations import calculate_uncertainty
-from .utils import tuple_to_string, ColorChooser, Operators, hex_to_rgba_str
+from phd_visualizations.constants import color_palette, default_fontsize, newshape_style, ArrayLike, named_css_colors
+from phd_visualizations.calculations import calculate_uncertainty
+from phd_visualizations.utils import tuple_to_string, ColorChooser, Operators, hex_to_rgba_str
 from plotly.colors import hex_to_rgb, qualitative
 
 logger.disable(__name__)
