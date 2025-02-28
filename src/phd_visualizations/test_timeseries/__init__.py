@@ -5,7 +5,6 @@ import copy
 #  and multiple yaxes, must have something to do with the way axis are configured
 # TODO: Uncertainty bounds not showing after last changes, used to work before (see figure from PID2024 article)
 # TODO: Take instrument from plot_config -> variables_config
-# TODO: Parameter to configure limits either: 'auto', 'manual' (calculated from min max of traces in axes), [min, max]
 
 import pandas as pd
 import numpy as np
@@ -22,20 +21,23 @@ from plotly.colors import hex_to_rgb, qualitative
 
 logger.disable(__name__)
 
-legends_plotly_ids = {}
+legends_dict = {"global": {}, "plots": {}}
 color_chooser = ColorChooser([
     color_palette['plotly_green'],
     color_palette['plotly_red']
 ])
 
 
-def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int, xaxes_idx: int,
-              resample: bool, show_arrow: bool = False, trace_color: str = None, uncertainty: ArrayLike = None,
-              row_idx: int = None,
-              axis_side: Literal['left', 'right'] = 'left', arrow_xrel_pos: int = None, var_config: dict = None,
-              df_comp: list[pd.DataFrame] = None,
-              index_adaptation_policy: Literal['adapt_to_ref', 'combine'] = 'adapt_to_ref',
-              **kwargs) -> go.Figure:
+def add_trace(
+    fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int, xaxes_idx: int,
+    resample: bool, show_arrow: bool = False, trace_color: str = None, uncertainty: ArrayLike = None,
+    row_idx: int = None,
+    axis_side: Literal['left', 'right'] = 'left', arrow_xrel_pos: int = None, var_config: dict = None,
+    df_comp: list[pd.DataFrame] = None,
+    index_adaptation_policy: Literal['adapt_to_ref', 'combine'] = 'adapt_to_ref',
+    legend_id: str = None,
+    **kwargs
+) -> go.Figure:
     """ Add custom trace to plotly figure, it can include:
         - Uncertainty bounds
         - Axis arrow
@@ -44,9 +46,7 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
     """
 
     var_id = trace_conf["var_id"]
-
     logger.debug(f'Attempting to add {var_id}')
-
     var_config = var_config if var_config is not None else {}
 
     if trace_color is not None:
@@ -54,18 +54,20 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
     else:
         color = None
 
-    legend_id = trace_conf.get('legend_id', None)
-
-    if legend_id is not None:
-        legend = legends_plotly_ids.get(legend_id, None)  # Should always be found
-
-        if legend is None:
-            logger.warning(f'legend_id {legend_id} not found in plot_config->legends, using default legend')
-            legend = 'legend'
-    else:
-        legend = None
-
     showlegend = trace_conf.get('showlegend', False)
+    legend = None
+    if showlegend:
+        if legend_id in trace_conf:
+            # Global legend
+            legend_id = trace_conf['legend_id']
+            assert legend_id in legends_dict["global"], f'legend_id {legend_id} not found in plot_config->legends. If a legen_id is speficied, a global legend with that id should exist in the configuration'
+            
+            legend = legends_dict["global"][legend_id]["plotly_id"]  # Should always be found
+
+        else:
+            # Plot legend
+            legend = legends_dict["plots"][legend_id]["plotly_id"]  # Should always be found
+
     name = trace_conf.get('name', None)
     if name is None:
         name = var_config.get('label_html', None)
@@ -130,6 +132,8 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
     # Movido más abajo al añadir soporte para múltiples comparaciones
     # plotly_resample_kwargs_comp = {'hf_x': df_comp[i].index, 'hf_y': df_comp[i][trace_conf['var_id']]} if (resample and df_comp[i] is not None) else {}
 
+    # No comparison data provided
+    customdata = None
     if df_comp is not None:
         N_comp = len(df_comp)
         # default = np.ones(df[trace_conf['var_id']].shape)*np.nan
@@ -169,10 +173,9 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
 
             customdata.append(data_comp)
         # customdata = [df_comp_.get(trace_conf['var_id'], None) for df_comp_ in df_comp]
-    else:
-        # No comparison data provided
-        customdata = None
 
+
+    hovertemplate = "%{y:.2f}"
     if customdata is not None and not all(element is None for element in customdata):
         customdata = np.stack(customdata, axis=-1)
 
@@ -213,9 +216,7 @@ def add_trace(fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int
                 )
             else:
                 logger.debug(
-                    f'Cant add comparison trace for {trace_conf["var_id"]} since it does not exist in df_comp[{i}]')
-    else:
-        hovertemplate = "%{y:.2f}"
+                    f'Cant add comparison trace for {trace_conf["var_id"]} since it does not exist in df_comp[{i}]')        
 
     # Configure fill_between
     if trace_conf.get('fill_between', False):
@@ -351,6 +352,8 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
     """ Generate plotly figure with experimental results
     """
 
+    global legends_dict
+    
     if reset_colors_per_plot:
         raise NotImplementedError('reset_colors_per_plot not implemented yet')
 
@@ -400,29 +403,12 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
         subplot_titles.append(plot_props.get("title", ""))
         row_heights.append(plot_props.get("row_height", 1))  # + gained_height_reduced_vs)
 
-    # Configure plot legends
-    plot_ids_set = set(plt_config['plots'].keys())
-    legend_ids_set = set(plt_config.get('legends', {}).keys())
-    common_ids = plot_ids_set & legend_ids_set
-
-    plots_legend_axes = {}
-
+    
+    # TODO: Remove optimization updates
     if not plt_config.get('show_optimization_updates', False):
         logger.info('Optimization updates not shown in plot, show_optimization_updates: false')
-
-    global legend_plotly_ids
-
-    # First global legends
-    leg_idx = 1
-    for id in legend_ids_set - common_ids:
-        legends_plotly_ids[id] = f'legend{leg_idx if leg_idx > 1 else ""}'
-        leg_idx += 1
-
-    # And then individual plot legends
-    for id in common_ids:
-        legends_plotly_ids[id] = f'legend{leg_idx if leg_idx > 1 else ""}'
-        leg_idx += 1
-
+        
+    # Configure plot ydomain
     rows = len(row_heights)
 
     total_row_heights = float(sum(row_heights))
@@ -453,6 +439,66 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
 
     # See plotly start_cell parameter
     domains.reverse()
+    
+    # Configure legends
+    plot_ids: list[str] = plt_config['plots'].keys()
+    plot_ids_set = set(plot_ids)
+    legend_ids_global_set = set(plt_config.get('legends', {}).keys())
+    common_ids = plot_ids_set & legend_ids_global_set
+    legend_ids_plots: list[str] = [plt_id for plt_id, conf in plt_config['plots'].items() if conf.get("showlegend", False)]
+    if len(common_ids) > 0:
+        raise ValueError(f'Global legend ids need to be different from plot ids: {common_ids}')
+
+    # Setup plotly legend ids
+    # First global legends
+    leg_idx = 1
+    for id in legend_ids_global_set:
+        logger.debug(f'Configuring global legend {id}')
+        legends_dict["global"][id] = {
+            "plotly_id": f'legend{leg_idx if leg_idx > 1 else ""}',
+            # Plotly limitation to use paper:
+            # https://plotly.com/python/legend/
+            "xref": 'paper', "yref": 'paper',
+            "bgcolor": plt_config["legends"].get("bgcolor_rgba", "rgba(0,0,0,0)"),
+            "orientation": plt_config["legends"].get("orientation", "v"),
+            "title": plt_config["legends"].get("title", None),
+            "font": plt_config["legends"].get("font", {"size": default_fontsize}),
+            "x": plt_config["legends"].get("x", 0.5),
+            "y": plt_config["legends"].get("y", 0.0),
+        }
+        leg_idx += 1
+    # And then individual plot legends
+    # req_field_ids = ["legend_position", ]
+    row_idx = -1
+    for plot_id in plot_ids:
+        row_idx += 1
+        
+        if plot_id not in legend_ids_plots:
+            continue
+        
+        logger.debug(f'Configuring plot legend for {plot_id}')
+        # Validate
+        # for req_field in req_field_ids:
+        #     assert req_field in plt_config['plots'][id].keys(), f'{req_field} not found in plot configuration for plot {id}'
+        legend_pos = plt_config['plots'][plot_id].get("legend_position", "side")
+        legend_xmargin = plt_config['plots'][plot_id].get("legend_xmargin", 0.05)
+        legends_dict["plots"][plot_id] = {
+            "plotly_id": f'legend{leg_idx if leg_idx > 1 else ""}',
+            # Plotly limitation to use paper:
+            # https://plotly.com/python/legend/
+            "xref": 'paper', "yref": 'paper',
+            "bgcolor": "rgba(0,0,0,0)",
+            # "orientation": "h",
+            "orientation": "v" if legend_pos == "side" else "h",
+            "yanchor": "top",
+            "font": dict(size=10),
+            "xanchor": "left" if legend_pos == "side" else "right", # "yanchor": "top",
+            "x": xdomain[1] + legend_xmargin if legend_pos == "side" else xdomain[1],
+            "y": domains[row_idx][1] if legend_pos == "side" else domains[row_idx][1] + .5* vertical_spacing,# + vertical_spacing,
+        }
+        leg_idx += 1
+        
+        # print(f"{plot_id}: {row_idx=}, {domains[row_idx]=}, {legends_dict['plots'][plot_id]['y']=}")
 
     xaxes_settings = {}
     yaxes_settings = {}
@@ -497,9 +543,11 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
         # traces = copy.deepcopy(traces_test)
 
         axes_idx = idx if idx > 1 else ""
-        xaxes_settings[f'xaxis{axes_idx}'] = dict(anchor=f'y{axes_idx}', matches='x' if idx > 1 else None,
-                                                  showticklabels=True if row_idx == rows - 1 else False,
-                                                  tickcolor="rgba(0,0,0,0)" if row_idx != rows - 1 else None)  # title= idx,
+        xaxes_settings[f'xaxis{axes_idx}'] = dict(
+            anchor=f'y{axes_idx}', matches='x' if idx > 1 else None,
+            showticklabels=True if row_idx == rows - 1 else False,
+            tickcolor="rgba(0,0,0,0)" if row_idx != rows - 1 else None
+        )  # title= idx,
         title = conf.get('ylabels_left', [None])[0]  # Only one axis is supported anyway
 
         if conf.get('tigth_vertical_spacing', None):
@@ -510,14 +558,15 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
             domain = domains[row_idx]
 
         # If axis limits specified manually, autorange must be set to False, otherwise it overrides the manual limits
-        yaxes_settings[f'yaxis{axes_idx}'] = {"domain": domain, 'anchor': f'x{axes_idx}', 'title': title,
-                                              'showgrid': True,
-                                              "autorange": False}
+        yaxes_settings[f'yaxis{axes_idx}'] = {
+            "domain": domain, 
+            'anchor': f'x{axes_idx}', 
+            'title': title,
+            'showgrid': True,
+            "autorange": False
+        }
 
         # Plot configuration
-        ## Associate legend  to axes
-        if plot_id in common_ids:
-            plots_legend_axes[plot_id] = {'axes_idx': axes_idx, 'domain': domain}
 
         ## Add background color
         bg_color = conf.get("bg_color", None)
@@ -641,10 +690,13 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                 'domain': (domains[row_idx + 1][-1], domains[row_idx][0] - vertical_spacing / 1.5),
                 'anchor': f'x{aux_idx}', 'showgrid': False, 'showticklabels': False,
                 'showline': False, 'zeroline': False, 'showspikes': False,
-                'fixedrange': True, 'tickcolor': "rgba(0,0,0,0)"}
-            xaxes_settings[f'xaxis{aux_idx}'] = {'anchor': f'y{aux_idx}', 'matches': 'x', 'showticklabels': False,
-                                                 'showgrid': False, 'showline': False, 'zeroline': False,
-                                                 'showspikes': False, 'tickcolor': "rgba(0,0,0,0)"}
+                'fixedrange': True, 'tickcolor': "rgba(0,0,0,0)"
+            }
+            xaxes_settings[f'xaxis{aux_idx}'] = {
+                'anchor': f'y{aux_idx}', 'matches': 'x', 'showticklabels': False,
+                'showgrid': False, 'showline': False, 'zeroline': False,
+                'showspikes': False, 'tickcolor': "rgba(0,0,0,0)"
+            }
 
             ### Add traces for every state change
             for i_act in range(1, len(active)):
@@ -667,8 +719,24 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                 fig.add_trace(trace_active)
 
         # Add left traces
-        min_y = 9999;
-        max_y = -9999
+        min_y = 9999
+        max_y_ = 0
+        max_y = 0
+        
+        # If no traces are specified, add a placeholder trace to avoid empty plots
+        if 'traces_left' not in conf.keys() or len(conf.get('traces_left', [])) == 0:
+            fig.add_trace(
+                go.Scatter(
+                    x=df.index, y=np.full((df.index.shape), np.nan),
+                    name=plot_id,
+                    mode='lines',
+                    line=dict(color='rgba(0,0,0,0)'),
+                    showlegend=False,
+                    legend=legends_dict["plots"][plot_id]["plotly_id"],
+                    xaxis=f'x{axes_idx}', yaxis=f'y{axes_idx}',
+                )
+            )
+        
         for trace_conf in conf['traces_left']:
 
             if '*' in trace_conf['var_id']:
@@ -701,8 +769,10 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                     var_config = vars_config_copy.get(group_var, {'var_id': group_var})
 
                     # Axis range
-                    min_y = np.nanmin([min_y, df[group_var].min()])
-                    max_y = np.nanmax([max_y, df[group_var].max()])
+                    min_y = np.nanmin([min_y, df[trace_conf['var_id']].min()])
+                    max_y_ = np.nanmax([max_y_, df[trace_conf['var_id']].max()])
+                    # If variables are stacked, the range is calculated based on the sum of the variables
+                    max_y = max_y_ if stackgroup is None else max_y + df[trace_conf['var_id']].max()
 
                     fig = add_trace(
                         fig=fig, trace_conf=trace_conf_copy, df=df, yaxes_idx=idx, xaxes_idx=axes_idx,
@@ -714,26 +784,31 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                         df_comp=df_comp,
                         stackgroup=group if 'fill' in trace_conf else None,
                         index_adaptation_policy=index_adaptation_policy,
+                        legend_id=plot_id,
                     )
 
             else:
                 trace_color = trace_conf.get("color", None)
                 uncertainty = calculate_uncertainty(df[trace_conf['var_id']],
-                                                    trace_conf['instrument']) if trace_conf.get(
-                    "instrument", None) else None
+                                                    trace_conf['instrument']) if trace_conf.get("instrument", None) else None
                 show_arrow = len(traces_right) > 0 and trace_conf.get('axis_arrow', False)
                 var_config = vars_config.get(trace_conf['var_id'], None) if vars_config is not None else None
-
+                stackgroup = trace_conf.get("stackgroup", None)
+                
                 # Axis range
                 min_y = np.nanmin([min_y, df[trace_conf['var_id']].min()])
-                max_y = np.nanmax([max_y, df[trace_conf['var_id']].max()])
+                max_y_ = np.nanmax([max_y_, df[trace_conf['var_id']].max()])
+                # If variables are stacked, the range is calculated based on the sum of the variables
+                max_y = max_y_ if stackgroup is None else max_y + df[trace_conf['var_id']].max()
 
                 fig = add_trace(fig=fig, trace_conf=trace_conf, df=df, yaxes_idx=idx, xaxes_idx=axes_idx,
                                 resample=resample,
                                 show_arrow=show_arrow, trace_color=trace_color, uncertainty=uncertainty,
                                 axis_side='left',
+                                stackgroup=stackgroup,
                                 row_idx=row_idx, arrow_xrel_pos=arrow_xrel_pos, var_config=var_config, df_comp=df_comp,
-                                index_adaptation_policy=index_adaptation_policy, )
+                                index_adaptation_policy=index_adaptation_policy,
+                                legend_id=plot_id,)
 
         # Manually set range for left axis, for some reason it does not work correctly automatically
         if conf.get('ylims_left', None) == 'manual':
@@ -783,7 +858,8 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                                     axis_side='right',
                                     row_idx=row_idx, arrow_xrel_pos=arrow_xrel_pos, var_config=var_config,
                                     df_comp=df_comp,
-                                    index_adaptation_policy=index_adaptation_policy, )
+                                    index_adaptation_policy=index_adaptation_policy,
+                                    legend_id=plot_id,)
 
                 # if isinstance(conf.get('ylims_right', None), list):
                 #     yaxes_settings[f'yaxis{idx}']['range'] = [conf['ylims_right'][0], conf['ylims_right'][1]]
@@ -791,48 +867,14 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                 # Add index for each right axis added
                 idx += 1
 
-    # Legends
+
+    # Build legends objects
     legends_layout = {}
-
-    # Global legends
-    for id in legend_ids_set - common_ids:
-        conf = plt_config['legends'][id]
-
-        color = color_palette[conf['bgcolor']] if conf['bgcolor'] in color_palette.keys() else conf['bgcolor']
-        try:
-            color = hex_to_rgba_str(color, alpha=0.1)
-        except ValueError:
-            logger.warning(
-                f'Invalid color {color} for legend {id}. Needs to be either in color_palette or an HSV colro code. Using default color')
-            color = hex_to_rgba_str(color_palette['gray'], alpha=0.1)
-
-        legends_layout[legends_plotly_ids[id]] = dict(
-            xref='paper', yref='paper',
-            x=conf["x"], y=conf["y"],
-
-            title=f"<b>{conf['title']}</b>" if 'title' in conf.keys() else None,
-            bgcolor=color,
-            font=dict(size=default_fontsize)
-        )
-
-    # Individual plot legends
-    for id in common_ids:
-        conf = plt_config['legends'][id]
-
-        color = color_palette[conf['bgcolor']] if conf['bgcolor'] in color_palette.keys() else conf['bgcolor']
-        color = hex_to_rgba_str(color, alpha=0.1)
-
-        legends_layout[legends_plotly_ids[id]] = dict(
-            # Can't use axis domain because it's not available for legends
-            xref='paper', yref='paper',
-            xanchor='right',  # yanchor='top',
-            x=0.9, y=plots_legend_axes[id]['domain'][-1] + vertical_spacing,
-            orientation='h',
-
-            title=f"<b>{conf['title']}</b>" if 'title' in conf.keys() else None,
-            bgcolor=color,
-            font=dict(size=10)
-        )
+    keys_to_skip = ["plotly_id", ]
+    for lg_values in [*legends_dict["global"].values(), *legends_dict["plots"].values()]:
+        legends_layout[lg_values["plotly_id"]] = {
+            name: value for name, value in lg_values.items() if name not in keys_to_skip
+        }
 
     if title_text is None:
         # Get from plot configuration
@@ -857,8 +899,9 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
         newshape=newshape_style,
         hovermode='x unified',
         hoverlabel=dict(
-            bgcolor="white",
+            bgcolor="rgba(0,0,0,0)",
             font_size=12,
+            bordercolor="rgba(0,0,0,0)"
             # font_family="Rockwell"
         ),
     )
@@ -867,12 +910,15 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
     # Add subplot titles
     axes_domains = []
     for ydomain in domains:
-        axes_domains.append(xdomain)
+        axes_domains.append((xdomain[0], xdomain[0]+0.15)) # To left align the titles
+        # axes_domains.append(xdomain) # To center align the titles
         axes_domains.append(ydomain)
+        
+    # print(f"{domains=}")
 
     # Better to left center them
     plot_title_annotations = plotly._subplots._build_subplot_title_annotations(
-        subplot_titles, axes_domains
+        subplot_titles, axes_domains,#title_edge="right"
     )
     fig.layout.annotations = fig.layout.annotations + tuple(plot_title_annotations)
 
