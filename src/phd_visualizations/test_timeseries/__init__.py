@@ -210,7 +210,8 @@ def add_trace(
                         xaxis=f'x{xaxes_idx}',
                         yaxis=f'y{yaxes_idx}',
                         # Hide tooltip
-                        hoverinfo='skip'
+                        hoverinfo='skip',
+                        **trace_conf.get("kwargs", {}),
                     ),
                     **plotly_resample_kwargs_comp
                 )
@@ -260,6 +261,7 @@ def add_trace(
             legend=legend,
             xaxis=f'x{xaxes_idx}',
             yaxis=f'y{yaxes_idx}',
+            **trace_conf.get("kwargs", {}),
 
             # Add customdata to show comparison values if provided
             customdata=customdata,
