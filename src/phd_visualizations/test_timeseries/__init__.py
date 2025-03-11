@@ -484,6 +484,12 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
         #     assert req_field in plt_config['plots'][id].keys(), f'{req_field} not found in plot configuration for plot {id}'
         legend_pos = plt_config['plots'][plot_id].get("legend_position", "side")
         legend_xmargin = plt_config['plots'][plot_id].get("legend_xmargin", 0.05)
+        legend_delta_y = plt_config['plots'][plot_id].get("legend_delta_y", plt_config.get("legend_delta_y", 0.0))
+        if legend_pos == "side":
+            y = domains[row_idx][1] + legend_delta_y
+        else:
+            y = domains[row_idx][1] + .6* vertical_spacing + legend_delta_y
+            
         legends_dict["plots"][plot_id] = {
             "plotly_id": f'legend{leg_idx if leg_idx > 1 else ""}',
             # Plotly limitation to use paper:
@@ -493,10 +499,12 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
             # "orientation": "h",
             "orientation": "v" if legend_pos == "side" else "h",
             "yanchor": "top",
-            "font": dict(size=10),
+            "font": dict(
+                size=plt_config['plots'][plot_id].get("legend_fontsize", plt_config.get("legend_fontsize", 11))
+            ),
             "xanchor": "left" if legend_pos == "side" else "right", # "yanchor": "top",
             "x": xdomain[1] + legend_xmargin if legend_pos == "side" else xdomain[1],
-            "y": domains[row_idx][1] if legend_pos == "side" else domains[row_idx][1] + .5* vertical_spacing,# + vertical_spacing,
+            "y": y
         }
         leg_idx += 1
         
@@ -923,13 +931,13 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
         
     # print(f"{domains=}")
 
-    # Better to left center them
     plot_title_annotations = plotly._subplots._build_subplot_title_annotations(
         subplot_titles, axes_domains,#title_edge="right"
     )
-    # Left-align titles
-    # I think this is doing nothing
-    [plt_anot.update({"xanchor": "left", "x": 0.5}) for plt_anot in plot_title_annotations]
+    # Left-align titles and check for delta_y
+    [plt_anot.update({"xanchor": "left", 
+                      "x": plt_config.get("subplot_titles_x", 0.0),
+                      "y": plt_anot["y"]+plt_conf.get("title_delta_y", 0.0)}) for plt_anot, plt_conf in zip(plot_title_annotations, plt_config["plots"].values())]
     fig.layout.annotations = fig.layout.annotations + tuple(plot_title_annotations)
 
     return fig
