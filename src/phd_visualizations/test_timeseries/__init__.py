@@ -290,7 +290,7 @@ def add_trace(
                 connectgaps=False,
                 fill='tonexty',
                 fillcolor=color_fill,
-                showlegend=showlegend,
+                showlegend=False,
                 legend=legend,
                 xaxis=f'x{xaxes_idx}',
                 yaxis=f'y{yaxes_idx}',
@@ -927,6 +927,9 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
     plot_title_annotations = plotly._subplots._build_subplot_title_annotations(
         subplot_titles, axes_domains,#title_edge="right"
     )
+    # Left-align titles
+    # I think this is doing nothing
+    [plt_anot.update({"xanchor": "left", "x": 0.5}) for plt_anot in plot_title_annotations]
     fig.layout.annotations = fig.layout.annotations + tuple(plot_title_annotations)
 
     return fig
