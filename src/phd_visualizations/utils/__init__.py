@@ -1,3 +1,4 @@
+from typing import Literal
 from pathlib import Path
 import pandas as pd
 from loguru import logger
@@ -115,3 +116,31 @@ def stack_images_vertically(image_path_top: Path, image_path_bottom: Path, outpu
     # Save or display the new image
     new_image.save(output_path, )
     # new_image.show()  # Uncomment to display the image
+    
+    
+def find_n_best_values_in_list(source_list: list[list[float]], n: int, objective: Literal["minimize", "maximize"] = "minimize") -> tuple[list[int], list[float]]:
+
+    best_idxs = [None] * n
+    best_fitness_list = [float("inf")] * n
+    
+    if objective == "minimize":
+        fitness_list = [np.min(np.array(case)) for case in source_list if len(case) > 0]
+    else:
+        fitness_list = [np.max(np.array(case)) for case in source_list if len(case) > 0]
+
+    for idx, fitness in enumerate(fitness_list):            
+        for i, best_fitness in enumerate(best_fitness_list):
+            # print(f"{fitness=} vs {best_fitness=} in position {i}")
+
+            if (objective == "minimize" and fitness < best_fitness) or (objective == "maximize" and fitness > best_fitness):
+                # Shift elements to the right from i
+                best_fitness_list[i+1:] = best_fitness_list[i:-1]
+                best_idxs[i+1:] = best_idxs[i:-1]
+                
+                # Insert new best fitness and index at position i
+                best_fitness_list[i] = fitness
+                best_idxs[i] = idx
+                break
+
+    logger.info(f"{best_fitness_list=} at {best_idxs=}")
+    return best_idxs, best_fitness_list
