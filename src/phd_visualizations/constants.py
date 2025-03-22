@@ -79,6 +79,8 @@ named_css_colors = [
     "yellowgreen"
 ]
 
+dash_types: list[str] = ['solid', 'dot', 'dash', 'longdash', 'dashdot', 'longdashdot']
+
 def generate_plotly_config(fig: go.Figure, figure_name: str = 'solhycool_plot',
                            file_format: Literal['png', 'svg', 'jpeg', 'webp'] = 'png',
                            height: int = None, width: int = None, scale: int = 2) -> dict:

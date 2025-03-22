@@ -824,11 +824,13 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
 
         # Manually set range for left axis, for some reason it does not work correctly automatically
         padding = (max_y - min_y) * 0.1  # Creo que lo hice mejor en webscada, revisar
-        if ylims_left == "manual_from_zero":
-            min_y = 0
-            padding = 0
-        if ylims_left == 'manual':
-            yaxes_settings[f'yaxis{axes_idx}']['range'] = [min_y - padding, max_y + padding]
+        if ylims_left in ['manual', "manual_from_zero"]:
+            padding_min = padding
+            padding_max = padding
+            if ylims_left == "manual_from_zero":
+                min_y = 0
+                padding_min = 0
+            yaxes_settings[f'yaxis{axes_idx}']['range'] = [min_y - padding_min, max_y + padding_max]
 
         elif isinstance(ylims_left, list):
             yaxes_settings[f'yaxis{axes_idx}']['range'] = [conf['ylims_left'][0], conf['ylims_left'][1]]
