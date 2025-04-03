@@ -120,8 +120,8 @@ def stack_images_vertically(image_path_top: Path, image_path_bottom: Path, outpu
     
 def find_n_best_values_in_list(source_list: list[list[float]], n: int, objective: Literal["minimize", "maximize"] = "minimize") -> tuple[list[int], list[float]]:
 
-    best_idxs = [None] * n
-    best_fitness_list = [float("inf")] * n
+    best_idxs = [None] * (n+1)
+    best_fitness_list = [float("inf")] * (n+1)
     
     if objective == "minimize":
         fitness_list = [np.min(np.array(case)) for case in source_list if len(case) > 0]

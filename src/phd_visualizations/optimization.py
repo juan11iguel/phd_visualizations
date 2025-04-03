@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 import numpy as np
+import pandas as pd
 import plotly.graph_objects as go
 import plotly.colors
 
@@ -11,35 +12,45 @@ gray_colors = plotly.colors.sequential.Greys[2:][::-1]
 green_colors = plotly.colors.sequential.Greens[2:][::-1]
 
         
-def plot_obj_scape_comp_1d(fitness_history_list: list[np.ndarray[float]], algo_ids: list[str], highlight_best: int = 0, **kwargs) -> go.Figure:
+def plot_obj_scape_comp_1d(fitness_history_list: list[np.ndarray[float] | list[pd.Series]], algo_ids: list[str], highlight_best: int = 0, showlegend: bool = True, **kwargs) -> go.Figure:
     
     assert len(fitness_history_list) == len(algo_ids), "fitness_history_list and algo_ids should have the same length"
     
-    best_fit_idxs, _ = find_n_best_values_in_list(fitness_history_list, n=highlight_best, objective="minimize")
+    best_fit_idxs, _ = find_n_best_values_in_list([np.asarray(f).tolist() for f in fitness_history_list], n=highlight_best, objective="minimize")
 
     # First create the base plot calling plot_obj_space_1d_no_animation
     fig = plot_obj_space_1d_no_animation(fitness_history_list[0], algo_id=algo_ids[0], 
                                          showlegend=True,
                                          line_color=plt_colors[0] if highlight_best == 0 else gray_colors[-1],)
-        
+    # Add the rest of the traces
     for idx, (algo_id, fitness_history) in enumerate( zip(algo_ids[1:], fitness_history_list[1:]) ):
+        # print(algo_id, len(fitness_history))
+        if not len(fitness_history) > 0:
+            continue 
+        
         avg_fitness = [np.mean(x) for x in fitness_history]
-        generation = np.arange(len(fitness_history))
+        if isinstance(fitness_history, pd.Series):
+            generation = fitness_history.index
+        else:
+            generation = np.arange(len(fitness_history))
         
         if highlight_best > 0:
-            showlegend = False
+            showlegend_ = showlegend
             line_color = gray_colors[-1]
         else:
-            showlegend = True
+            showlegend_ = True
             line_color = plt_colors[idx+1]
         
-        fig.add_trace(go.Scatter(x=generation, y=avg_fitness, mode="lines", name=algo_id.replace("_", " "), showlegend=showlegend, line=dict(color=line_color)))
+        fig.add_trace(go.Scatter(x=generation, y=avg_fitness, mode="lines", name=algo_id.replace("_", " "), showlegend=showlegend_, line=dict(color=line_color)))
         
     # Add best traces at the end
     if highlight_best > 0:
         for idx, best_fit_idx in enumerate(best_fit_idxs):
             avg_fitness = [np.mean(x) for x in fitness_history_list[best_fit_idx]]
-            generation = np.arange(len(fitness_history_list[best_fit_idx]))
+            if isinstance(fitness_history_list[best_fit_idx], pd.Series):
+                generation = fitness_history_list[best_fit_idx].index
+            else:
+                generation = np.arange(len(fitness_history_list[best_fit_idx]))
             
             fig.add_trace(go.Scatter(x=generation, y=avg_fitness, mode="lines", name=f"{algo_ids[best_fit_idx].replace('_', ' ')}", line=dict(color=plt_colors[idx], width=3)))
         
@@ -59,10 +70,15 @@ def plot_obj_space_1d(fitness_history: list[np.ndarray[float]], animation: bool 
         return plot_obj_space_1d_no_animation(fitness_history, **kwargs)
 
 
-def plot_obj_space_1d_no_animation(fitness_history: list[np.ndarray[float]], algo_id: str = None, line_color=plt_colors[0],**kwargs) -> go.Figure:
+def plot_obj_space_1d_no_animation(fitness_history: list[np.ndarray[float]] | list[pd.Series], algo_id: str = None, line_color=plt_colors[0],**kwargs) -> go.Figure:
 
     avg_fitness = [np.mean(x) for x in fitness_history]
-    generation = np.arange(len(fitness_history))
+    if isinstance(fitness_history, pd.Series):
+        generation = fitness_history.index
+    else:
+        generation = np.arange(len(fitness_history))
+
+    # print(generation)
 
     additional_scatters = []
     if isinstance(fitness_history[0], Iterable):
@@ -90,6 +106,13 @@ def plot_obj_space_1d_no_animation(fitness_history: list[np.ndarray[float]], alg
                        line=dict(color=line_color)),
         ],
         layout=go.Layout(
+            hovermode='x unified',
+            hoverlabel=dict(
+                bgcolor="rgba(0,0,0,0)",
+                font_size=12,
+                bordercolor="rgba(0,0,0,0)"
+                # font_family="Rockwell"
+            ),
             # legend={
             #     "x": 1,
             #     "y": 1,

@@ -554,10 +554,13 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
 
         axes_idx = idx if idx > 1 else ""
         xaxes_settings[f'xaxis{axes_idx}'] = dict(
-            anchor=f'y{axes_idx}', matches='x' if idx > 1 else None,
-            showticklabels=True if row_idx == rows - 1 else False,
-            tickcolor="rgba(0,0,0,0)" if row_idx != rows - 1 else None
-        )  # title= idx,
+            anchor=f'y{axes_idx}', 
+            matches='x' if idx > 1 and not conf.get("independent_xaxis", False) else None,
+            showticklabels=True if row_idx == rows - 1 or conf.get("independent_xaxis", False) else False,
+            tickcolor="rgba(0,0,0,0)" if row_idx != rows - 1 else None,
+            title_text=conf.get("xaxis_title_text", None),
+            title_standoff=conf.get("xaxis_title_standoff", None),
+        )
         title = conf.get('ylabels_left', [None])[0]  # Only one axis is supported anyway
 
         if conf.get('tigth_vertical_spacing', None):
@@ -914,13 +917,6 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
         **legends_layout,
         shapes=shapes,
         newshape=newshape_style,
-        hovermode='x unified',
-        hoverlabel=dict(
-            bgcolor="rgba(0,0,0,0)",
-            font_size=12,
-            bordercolor="rgba(0,0,0,0)"
-            # font_family="Rockwell"
-        ),
     )
     fig.update_xaxes(domain=xdomain)
 
