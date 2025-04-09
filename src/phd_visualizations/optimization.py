@@ -81,7 +81,7 @@ def plot_obj_space_1d_no_animation(fitness_history: list[np.ndarray[float]] | li
     # print(generation)
 
     additional_scatters = []
-    if isinstance(fitness_history[0], Iterable):
+    if isinstance(np.asarray(fitness_history)[0], Iterable):
         min_fitness = [np.min(x) for x in fitness_history]
         max_fitness = [np.max(x) for x in fitness_history]
         median_fitness = [np.median(x) for x in fitness_history]
