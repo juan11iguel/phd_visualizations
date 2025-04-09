@@ -560,6 +560,7 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
             tickcolor="rgba(0,0,0,0)" if row_idx != rows - 1 else None,
             title_text=conf.get("xaxis_title_text", None),
             title_standoff=conf.get("xaxis_title_standoff", None),
+            minor={"showgrid": plt_config.get("xminor", False)},
         )
         title = conf.get('ylabels_left', [None])[0]  # Only one axis is supported anyway
 
