@@ -29,13 +29,23 @@ color_chooser = ColorChooser([
 
 
 def add_trace(
-    fig: go.Figure, trace_conf: dict, df: pd.DataFrame, yaxes_idx: int, xaxes_idx: int,
-    resample: bool, show_arrow: bool = False, trace_color: str = None, uncertainty: ArrayLike = None,
+    fig: go.Figure, 
+    trace_conf: dict, 
+    df: pd.DataFrame, 
+    yaxes_idx: int, 
+    xaxes_idx: int,
+    resample: bool, 
+    show_arrow: bool = False, 
+    trace_color: str = None, 
+    uncertainty: ArrayLike = None,
     row_idx: int = None,
-    axis_side: Literal['left', 'right'] = 'left', arrow_xrel_pos: int = None, var_config: dict = None,
+    axis_side: Literal['left', 'right'] = 'left', 
+    arrow_xrel_pos: int = None, 
+    var_config: dict = None,
     df_comp: list[pd.DataFrame] = None,
     index_adaptation_policy: Literal['adapt_to_ref', 'combine'] = 'adapt_to_ref',
     legend_id: str = None,
+    legend_yaxis_indicator: str = None,
     **kwargs
 ) -> go.Figure:
     """ Add custom trace to plotly figure, it can include:
@@ -75,6 +85,8 @@ def add_trace(
         name = var_config.get('var_id', None)
     if name is None:
         name = trace_conf.get('var_id', None)
+    if legend_yaxis_indicator is not None:
+        name = f"{name} {legend_yaxis_indicator}"
 
     # if name is None:
     #     raise KeyError(f'No name for variable {} could be found in any of the available options')
@@ -346,11 +358,19 @@ def add_trace(
     return fig
 
 
-def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.DataFrame | None = None,
-                              df_comp: pd.DataFrame | list[pd.DataFrame] = None, title_text: str = None,
-                              resample: bool = True, vars_config: dict = None,
-                              index_adaptation_policy: Literal['adapt_to_ref', 'combine'] = 'adapt_to_ref',
-                              reset_colors_per_plot: bool = False) -> go.Figure:
+def experimental_results_plot(
+    plt_config: dict, 
+    df: pd.DataFrame, 
+    df_opt: pd.DataFrame | None = None, # TODO: Should be removed
+    df_comp: pd.DataFrame | list[pd.DataFrame] = None, 
+    title_text: str = None,
+    resample: bool = True, 
+    vars_config: dict = None,
+    index_adaptation_policy: Literal['adapt_to_ref', 'combine'] = 'adapt_to_ref',
+    reset_colors_per_plot: bool = False,
+    legend_yaxis_indicator_symbols: tuple[str, str] = ("❮", "❯"),
+) -> go.Figure:
+    
     """ Generate plotly figure with experimental results
     """
 
@@ -561,7 +581,9 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
             title_text=conf.get("xaxis_title_text", None),
             title_standoff=conf.get("xaxis_title_standoff", None),
             minor={"showgrid": plt_config.get("xminor", False)},
-        )
+        )  # title= idx,
+        # print(f"{xaxes_settings=}")
+        
         title = conf.get('ylabels_left', [None])[0]  # Only one axis is supported anyway
 
         if conf.get('tigth_vertical_spacing', None):
@@ -746,7 +768,7 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                     mode='lines',
                     line=dict(color='rgba(0,0,0,0)'),
                     showlegend=False,
-                    legend=legends_dict["plots"][plot_id]["plotly_id"],
+                    legend=legends_dict["plots"].get("plotly_id", {"plotly_id": None})["plotly_id"],
                     xaxis=f'x{axes_idx}', yaxis=f'y{axes_idx}',
                 )
             )
@@ -810,6 +832,8 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                 show_arrow = len(traces_right) > 0 and trace_conf.get('axis_arrow', False)
                 var_config = vars_config.get(trace_conf['var_id'], None) if vars_config is not None else None
                 stackgroup = trace_conf.get("stackgroup", None)
+                # Show yaxis indicator in legend if more than one left-yaxis is used
+                legend_yaxis_indicator = legend_yaxis_indicator_symbols[0] if len(traces_right) > 0 else None
                 
                 # Axis range
                 min_y = np.nanmin([min_y, df[trace_conf['var_id']].min()])
@@ -817,14 +841,26 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                 # If variables are stacked, the range is calculated based on the sum of the variables
                 max_y = max_y_ if stackgroup is None else max_y + df[trace_conf['var_id']].max()
 
-                fig = add_trace(fig=fig, trace_conf=trace_conf, df=df, yaxes_idx=idx, xaxes_idx=axes_idx,
-                                resample=resample,
-                                show_arrow=show_arrow, trace_color=trace_color, uncertainty=uncertainty,
-                                axis_side='left',
-                                stackgroup=stackgroup,
-                                row_idx=row_idx, arrow_xrel_pos=arrow_xrel_pos, var_config=var_config, df_comp=df_comp,
-                                index_adaptation_policy=index_adaptation_policy,
-                                legend_id=plot_id,)
+                fig = add_trace(
+                    fig=fig, 
+                    trace_conf=trace_conf, 
+                    df=df, 
+                    yaxes_idx=idx, 
+                    xaxes_idx=axes_idx,
+                    resample=resample,
+                    show_arrow=show_arrow, 
+                    trace_color=trace_color, 
+                    uncertainty=uncertainty,
+                    axis_side='left',
+                    stackgroup=stackgroup,
+                    row_idx=row_idx, 
+                    arrow_xrel_pos=arrow_xrel_pos, 
+                    var_config=var_config, 
+                    df_comp=df_comp,
+                    index_adaptation_policy=index_adaptation_policy,
+                    legend_id=plot_id,
+                    legend_yaxis_indicator=legend_yaxis_indicator
+                )
 
         # Manually set range for left axis, for some reason it does not work correctly automatically
         padding = (max_y - min_y) * 0.1  # Creo que lo hice mejor en webscada, revisar
@@ -871,16 +907,30 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
                                                                                                     None) else None
                     show_arrow = trace_conf.get('axis_arrow', False)
                     var_config = vars_config.get(trace_conf['var_id'], None) if vars_config is not None else None
+                    # Show yaxis indicator in legend if more than one left-yaxis is used
+                    legend_yaxis_indicator = "".join([legend_yaxis_indicator_symbols[1]] * (pos_idx+1))
+
 
                     logger.debug(f'Adding trace {trace_conf["var_id"]} to right yaxis {idx}')
-                    fig = add_trace(fig=fig, trace_conf=trace_conf, df=df, yaxes_idx=idx, xaxes_idx=axes_idx,
-                                    resample=resample,
-                                    show_arrow=show_arrow, trace_color=trace_color, uncertainty=uncertainty,
-                                    axis_side='right',
-                                    row_idx=row_idx, arrow_xrel_pos=arrow_xrel_pos, var_config=var_config,
-                                    df_comp=df_comp,
-                                    index_adaptation_policy=index_adaptation_policy,
-                                    legend_id=plot_id,)
+                    fig = add_trace(
+                        fig=fig, 
+                        trace_conf=trace_conf, 
+                        df=df, 
+                        yaxes_idx=idx, 
+                        xaxes_idx=axes_idx,
+                        resample=resample,
+                        show_arrow=show_arrow, 
+                        trace_color=trace_color, 
+                        uncertainty=uncertainty,
+                        axis_side='right',
+                        row_idx=row_idx, 
+                        arrow_xrel_pos=arrow_xrel_pos, 
+                        var_config=var_config,
+                        df_comp=df_comp,
+                        index_adaptation_policy=index_adaptation_policy,
+                        legend_id=plot_id,
+                        legend_yaxis_indicator=legend_yaxis_indicator
+                    )
 
                 # if isinstance(conf.get('ylims_right', None), list):
                 #     yaxes_settings[f'yaxis{idx}']['range'] = [conf['ylims_right'][0], conf['ylims_right'][1]]
@@ -918,6 +968,13 @@ def experimental_results_plot(plt_config: dict, df: pd.DataFrame, df_opt: pd.Dat
         **legends_layout,
         shapes=shapes,
         newshape=newshape_style,
+        hovermode='x unified',
+        hoverlabel=dict(
+            bgcolor="rgba(0,0,0,0)",
+            font_size=12,
+            bordercolor="rgba(0,0,0,0)"
+            # font_family="Rockwell"
+        ),
     )
     fig.update_xaxes(domain=xdomain)
 
