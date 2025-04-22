@@ -141,10 +141,7 @@ def add_trace(
             **plotly_resample_kwargs
         )
 
-    # Movido más abajo al añadir soporte para múltiples comparaciones
-    # plotly_resample_kwargs_comp = {'hf_x': df_comp[i].index, 'hf_y': df_comp[i][trace_conf['var_id']]} if (resample and df_comp[i] is not None) else {}
-
-    # No comparison data provided
+    # Add comparison trace(s)
     customdata = None
     if df_comp is not None:
         N_comp = len(df_comp)
@@ -186,7 +183,6 @@ def add_trace(
             customdata.append(data_comp)
         # customdata = [df_comp_.get(trace_conf['var_id'], None) for df_comp_ in df_comp]
 
-
     hovertemplate = "%{y:.2f}"
     if customdata is not None and not all(element is None for element in customdata):
         customdata = np.stack(customdata, axis=-1)
@@ -205,10 +201,14 @@ def add_trace(
                     color_comp = named_css_colors[i]
                 else:
                     color_comp = color
+                    
+                stackgroup_comp = kwargs.get('stackgroup', None)
+                if stackgroup_comp is not None:
+                    stackgroup_comp = f"{stackgroup_comp}_comp_{i}"
 
                 # if trace_conf['var_id'] in df_comp[i].columns:
                 fig.add_trace(
-                    go.Scattergl(
+                    go.Scatter(
                         x=df.index if not resample else None,
                         y=comp if not resample else None,
                         name=f"{name} comparison {i}",
@@ -223,7 +223,9 @@ def add_trace(
                         yaxis=f'y{yaxes_idx}',
                         # Hide tooltip
                         hoverinfo='skip',
-                        **trace_conf.get("kwargs", {}),
+                        # **trace_conf.get("kwargs", {}),
+                        stackgroup=stackgroup_comp,
+                        fillcolor="rgba(0,0,0,0)",
                     ),
                     **plotly_resample_kwargs_comp
                 )
@@ -255,6 +257,10 @@ def add_trace(
         if not color.startswith("rgba"):
             color = hex_to_rgba_str(color, alpha=trace_conf['opacity'])
 
+    width = trace_conf.get('width', 2)
+    if df_comp is not None:
+        width = width * 1.25
+
     fig.add_trace(
         go.Scatter(
             x=df.index if not resample else None,
@@ -264,7 +270,7 @@ def add_trace(
             line=dict(
                 color=color,
                 dash=trace_conf.get('dash', None),
-                width=trace_conf.get('width', None)
+                width=width
             ),
             fill=trace_conf.get('fill', None) if not fill_between else None,  # fillcolor=f'rgba({color_rgb}, 0.1)',
             fillpattern=dict(shape=trace_conf.get('fill_pattern', None)),
@@ -341,9 +347,6 @@ def add_trace(
     if show_arrow:
         # Get the trace
         trace = fig.data[-1]
-
-        tr_idx = 0 if axis_side == 'left' else -1
-        xshift = -1 if axis_side == 'left' else 1
         ax = 25 if axis_side == 'left' else -25
 
         fig.add_annotation(
