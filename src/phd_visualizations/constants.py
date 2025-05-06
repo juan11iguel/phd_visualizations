@@ -81,7 +81,7 @@ named_css_colors = [
 ]
 
 # Symbols
-symbols = [raw_symbols[i+2] for i in range(0,len(SymbolValidator().values),3)]
+symbols = [SymbolValidator().values[i+2] for i in range(0,len(SymbolValidator().values),3)]
 
 def generate_plotly_config(fig: go.Figure, figure_name: str = 'solhycool_plot',
                            file_format: Literal['png', 'svg', 'jpeg', 'webp'] = 'png',
