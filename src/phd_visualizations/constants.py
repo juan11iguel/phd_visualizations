@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from typing import Literal
 from collections import OrderedDict
+from plotly.validators.scatter.marker import SymbolValidator
 
 # Colors definition
 color_palette = OrderedDict({
@@ -79,7 +80,8 @@ named_css_colors = [
     "yellowgreen"
 ]
 
-dash_types: list[str] = ['solid', 'dot', 'dash', 'longdash', 'dashdot', 'longdashdot']
+# Symbols
+symbols = [raw_symbols[i+2] for i in range(0,len(SymbolValidator().values),3)]
 
 def generate_plotly_config(fig: go.Figure, figure_name: str = 'solhycool_plot',
                            file_format: Literal['png', 'svg', 'jpeg', 'webp'] = 'png',
