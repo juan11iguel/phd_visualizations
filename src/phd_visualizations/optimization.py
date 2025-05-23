@@ -14,10 +14,13 @@ green_colors = plotly.colors.sequential.Greens[2:][::-1]
         
 def plot_obj_scape_comp_1d(fitness_history_list: list[np.ndarray[float] | list[pd.Series]], algo_ids: list[str], highlight_best: int = 0, showlegend: bool = True, **kwargs) -> go.Figure:
     
-    assert len(fitness_history_list) == len(algo_ids), "fitness_history_list and algo_ids should have the same length"
+    if highlight_best == 0:
+        assert len(fitness_history_list) == len(algo_ids), "fitness_history_list and algo_ids should have the same length"
+    else:
+        assert len(fitness_history_list)+1 == len(algo_ids), "algo_ids should have one more elements than fitness_history_list to include the non-highlighted group legend entry"
     
     best_fit_idxs, _ = find_n_best_values_in_list([np.asarray(f).tolist() for f in fitness_history_list], n=highlight_best, objective="minimize")
-
+    
     # First create the base plot calling plot_obj_space_1d_no_animation
     fig = plot_obj_space_1d_no_animation(fitness_history_list[0], algo_id=algo_ids[0], 
                                          showlegend=True,
@@ -52,7 +55,7 @@ def plot_obj_scape_comp_1d(fitness_history_list: list[np.ndarray[float] | list[p
             else:
                 generation = np.arange(len(fitness_history_list[best_fit_idx]))
             
-            fig.add_trace(go.Scatter(x=generation, y=avg_fitness, mode="lines", name=f"{algo_ids[best_fit_idx].replace('_', ' ')}", line=dict(color=plt_colors[idx], width=3)))
+            fig.add_trace(go.Scatter(x=generation, y=avg_fitness, mode="lines", name=f"{algo_ids[best_fit_idx+1].replace('_', ' ')}", line=dict(color=plt_colors[idx], width=3)))
         
     fig.update_layout(**kwargs)
     
