@@ -83,6 +83,9 @@ named_css_colors = [
 # Symbols
 symbols = [SymbolValidator().values[i+2] for i in range(0,len(SymbolValidator().values),3)]
 
+# Dash types
+dash_types = ['solid', 'dot', 'dash', 'longdash', 'dashdot', 'longdashdot']
+
 def generate_plotly_config(fig: go.Figure, figure_name: str = 'solhycool_plot',
                            file_format: Literal['png', 'svg', 'jpeg', 'webp'] = 'png',
                            height: int = None, width: int = None, scale: int = 2) -> dict:
