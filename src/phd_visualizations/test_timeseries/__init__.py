@@ -14,7 +14,7 @@ import re
 import plotly
 import plotly.graph_objects as go
 from loguru import logger
-from phd_visualizations.constants import color_palette, default_fontsize, newshape_style, ArrayLike, named_css_colors
+from phd_visualizations.constants import color_palette, default_fontsize, newshape_style, ArrayLike, named_css_colors, dash_types
 from phd_visualizations.calculations import calculate_uncertainty
 from phd_visualizations.utils import tuple_to_string, ColorChooser, Operators, hex_to_rgba_str
 from plotly.colors import hex_to_rgb, qualitative
@@ -787,6 +787,8 @@ def experimental_results_plot(
                 # Group of variables
                 pattern = re.escape(trace_conf["var_id"]).replace(r'\*', '.*')
                 group_vars = [var for var in df.columns if re.match(pattern, var)]
+                # sort group_vars alphabetically
+                group_vars.sort()
                 group = trace_conf["var_id"][:-1].replace('*', '')
                 # group = trace_conf["var_id"][:-1]
                 # group_vars = [var for var in df.columns if var.startswith(group)]
@@ -797,6 +799,8 @@ def experimental_results_plot(
                 vars_config_copy = copy.deepcopy(vars_config)
                 for color_idx, group_var in enumerate(group_vars):
                     trace_conf_copy['var_id'] = group_var
+                    # Assign a dash
+                    trace_conf_copy['dash'] = dash_types[color_idx % len(dash_types)]
 
                     # Ensure color_idx cycles through the length of qualitative.Plotly
                     color_idx = color_idx % len(qualitative.Plotly)
@@ -810,10 +814,10 @@ def experimental_results_plot(
                     var_config = vars_config_copy.get(group_var, {'var_id': group_var})
 
                     # Axis range
-                    min_y = np.nanmin([min_y, df[trace_conf['var_id']].min()])
-                    max_y_ = np.nanmax([max_y_, df[trace_conf['var_id']].max()])
+                    min_y = np.nanmin([min_y, df[group_var].min()])
+                    max_y_ = np.nanmax([max_y_, df[group_var].max()])
                     # If variables are stacked, the range is calculated based on the sum of the variables
-                    max_y = max_y_ if stackgroup is None else max_y + df[trace_conf['var_id']].max()
+                    max_y = max_y_ if stackgroup is None else max_y + df[group_var].max()
 
                     fig = add_trace(
                         fig=fig, trace_conf=trace_conf_copy, df=df, yaxes_idx=idx, xaxes_idx=axes_idx,

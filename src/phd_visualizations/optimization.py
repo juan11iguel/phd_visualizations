@@ -12,24 +12,34 @@ gray_colors = plotly.colors.sequential.Greys[2:][::-1]
 green_colors = plotly.colors.sequential.Greens[2:][::-1]
 
         
-def plot_obj_scape_comp_1d(fitness_history_list: list[np.ndarray[float] | list[pd.Series]], algo_ids: list[str], highlight_best: int = 0, showlegend: bool = True, **kwargs) -> go.Figure:
+def plot_obj_scape_comp_1d(
+    fitness_history_list: list[np.ndarray[float] | list[pd.Series]], 
+    algo_ids: list[str], 
+    highlight_best: int = 0, 
+    global_legend: bool = True,
+    showlegend: bool = True, 
+    non_highlighted_id: str = "other", 
+    **kwargs
+) -> go.Figure:
     
-    if highlight_best == 0:
-        assert len(fitness_history_list) == len(algo_ids), "fitness_history_list and algo_ids should have the same length"
-    else:
-        assert len(fitness_history_list)+1 == len(algo_ids), "algo_ids should have one more elements than fitness_history_list to include the non-highlighted group legend entry"
+    # if highlight_best == 0:
+    assert len(fitness_history_list) == len(algo_ids), "fitness_history_list and algo_ids should have the same length"
+    # else:
+    #     assert len(fitness_history_list)+1 == len(algo_ids), "algo_ids should have one more elements than fitness_history_list to include the non-highlighted group legend entry"
     
-    best_fit_idxs, _ = find_n_best_values_in_list([np.asarray(f).tolist() for f in fitness_history_list], n=highlight_best, objective="minimize")
+    # Filter out entries where fitness_history is empty
+    fitness_history_list = [f for f in fitness_history_list if len(f) > 0]
+    algo_ids = [algo_id for algo_id, fitness_history in zip(algo_ids, fitness_history_list) if len(fitness_history) > 0]
     
     # First create the base plot calling plot_obj_space_1d_no_animation
-    fig = plot_obj_space_1d_no_animation(fitness_history_list[0], algo_id=algo_ids[0], 
+    fig = plot_obj_space_1d_no_animation(fitness_history_list[0], algo_id=algo_ids[0] if (highlight_best == 0 or showlegend) else non_highlighted_id, 
                                          showlegend=True,
                                          line_color=plt_colors[0] if highlight_best == 0 else gray_colors[-1],)
     # Add the rest of the traces
     for idx, (algo_id, fitness_history) in enumerate( zip(algo_ids[1:], fitness_history_list[1:]) ):
         # print(algo_id, len(fitness_history))
-        if not len(fitness_history) > 0:
-            continue 
+        # if not len(fitness_history) > 0:
+        #     continue 
         
         avg_fitness = [np.mean(x) for x in fitness_history]
         if isinstance(fitness_history, pd.Series):
@@ -48,6 +58,10 @@ def plot_obj_scape_comp_1d(fitness_history_list: list[np.ndarray[float] | list[p
         
     # Add best traces at the end
     if highlight_best > 0:
+        best_fit_idxs, _ = find_n_best_values_in_list([np.asarray(f).tolist() for f in fitness_history_list], n=highlight_best, objective="minimize")
+        
+        print([algo_ids[best_idx] for best_idx in best_fit_idxs])
+        
         for idx, best_fit_idx in enumerate(best_fit_idxs):
             avg_fitness = [np.mean(x) for x in fitness_history_list[best_fit_idx]]
             if isinstance(fitness_history_list[best_fit_idx], pd.Series):
@@ -55,9 +69,17 @@ def plot_obj_scape_comp_1d(fitness_history_list: list[np.ndarray[float] | list[p
             else:
                 generation = np.arange(len(fitness_history_list[best_fit_idx]))
             
-            fig.add_trace(go.Scatter(x=generation, y=avg_fitness, mode="lines", name=f"{algo_ids[best_fit_idx+1].replace('_', ' ')}", line=dict(color=plt_colors[idx], width=3)))
+            fig.add_trace(
+                go.Scatter(
+                    x=generation, 
+                    y=avg_fitness, 
+                    mode="lines", 
+                    name=f"{algo_ids[best_fit_idx].replace('_', ' ')}", 
+                    line=dict(color=plt_colors[idx], width=3),
+                )
+            )
         
-    fig.update_layout(**kwargs)
+    fig.update_layout(showlegend=global_legend, **kwargs)
     
     return fig
         

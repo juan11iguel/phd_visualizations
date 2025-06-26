@@ -117,6 +117,25 @@ def stack_images_vertically(image_path_top: Path, image_path_bottom: Path, outpu
     new_image.save(output_path, )
     # new_image.show()  # Uncomment to display the image
     
+def stack_images_horizontally(image_paths: list[Path], output_path: Path) -> None:
+    # Load all images
+    images = [Image.open(path) for path in image_paths]
+    
+    # Calculate total width and max height for the new image
+    total_width = sum(img.width for img in images)
+    max_height = max(img.height for img in images)
+    
+    # Create a new blank image with the combined dimensions
+    new_image = Image.new('RGB', (total_width, max_height))
+    
+    # Paste images side by side
+    x_offset = 0
+    for img in images:
+        new_image.paste(img, (x_offset, 0))
+        x_offset += img.width
+    
+    # Save the new image
+    new_image.save(output_path)
     
 def find_n_best_values_in_list(source_list: list[list[float]], n: int, objective: Literal["minimize", "maximize"] = "minimize") -> tuple[list[int], list[float]]:
 
