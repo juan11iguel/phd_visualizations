@@ -4,7 +4,19 @@ import plotly.express as px
 import plotly.graph_objects as go
 from typing import Literal
 from collections import OrderedDict
-from plotly.validators.scatter.marker import SymbolValidator
+import plotly
+
+from packaging import version
+
+if version.parse(plotly.__version__) >= version.parse("6.0.0"):
+    # Plotly 6+
+    from plotly.validator_cache import ValidatorCache
+    SymbolValidator = ValidatorCache.get_validator("scatter.marker", "symbol")
+    symbols = SymbolValidator.values
+else:
+    # Plotly 5.x and below
+    from plotly.validators.scatter.marker import SymbolValidator
+    symbols = SymbolValidator().values  # May need filtering depending on internal format
 
 # Colors definition
 color_palette = OrderedDict({

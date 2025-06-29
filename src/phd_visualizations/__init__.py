@@ -4,7 +4,6 @@ from pathlib import Path
 import plotly.graph_objects as go
 import typing
 from loguru import logger
-from .constants import color_palette, plt_colors, default_fontsize, newshape_style
 
 Argument = typing.Literal['eps', 'png', 'svg', 'html']
 VALID_FIGURE_FORMATS: typing.Tuple[Argument, ...] = typing.get_args(Argument)
