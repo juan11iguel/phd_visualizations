@@ -93,9 +93,8 @@ named_css_colors = [
 ]
 
 # Symbols
-symbols = [SymbolValidator().values[i+2] for i in range(0,len(SymbolValidator().values),3)]
+symbols = [symbols[i+2] for i in range(0,len(symbols),3)]
 symbols_open = [s for s in symbols if 'open' in s]
-
 
 # Dash types
 dash_types = ['solid', 'dot', 'dash', 'longdash', 'dashdot', 'longdashdot']
