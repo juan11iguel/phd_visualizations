@@ -372,6 +372,7 @@ def experimental_results_plot(
     index_adaptation_policy: Literal['adapt_to_ref', 'combine'] = 'adapt_to_ref',
     reset_colors_per_plot: bool = False,
     legend_yaxis_indicator_symbols: tuple[str, str] = ("❮", "❯"),
+    template: str = None,
 ) -> go.Figure:
     
     """ Generate plotly figure with experimental results
@@ -392,6 +393,9 @@ def experimental_results_plot(
 
     if df_comp is not None and not isinstance(df_comp, list):
         df_comp = [df_comp]
+        
+    if template is None:
+        template = plt_config.get('template', 'custom')
 
     # Create a copy of the input dataframe to avoid modifying the original
     df = df.copy()
@@ -408,9 +412,9 @@ def experimental_results_plot(
     vertical_spacing = plt_config.get("vertical_spacing", 0.03)
     # reduced_vs = vertical_spacing / 3
     xdomain = plt_config.get("xdomain", [0, 0.85])
+    yaxis_right_pos = plt_config.get("yaxis_right_pos", [.86, .95])
     height = plt_config["height"]
     width = plt_config["width"]
-    yaxis_right_pos = [.86, .95]
     arrow_xrel_pos = plt_config.get("arrow_xrel_pos", 20)
     default_active_color = {'active': color_palette['plotly_green'], 'inactive': color_palette['gray']}
     # tigth_vertical_spacing = [plot_props.get('tigth_vertical_spacing', False) for plot_props in plt_config['plots'].values()]
@@ -964,7 +968,6 @@ def experimental_results_plot(
         height=height,
         width=width,
         # plot_bgcolor='#ffffff',
-        plot_bgcolor='rgba(0,0,0,0)',
         # paper_bgcolor='#ffffff',
         # paper_bgcolor='rgba(0,0,0,0)',
         # title_text="Complex Plotly Figure Layout",
@@ -982,8 +985,15 @@ def experimental_results_plot(
             bordercolor="rgba(0,0,0,0)"
             # font_family="Rockwell"
         ),
+        plot_bgcolor='rgba(0,0,0,0)' if template == "custom" else None,
+        template=template if template != "custom" else "plotly",  # Use custom template if specified
     )
-    fig.update_xaxes(domain=xdomain)
+    
+    # Update xaxis settings
+    fig.update_xaxes(domain=xdomain,) #minor={"showgrid": plt_config.get("xaxis_minor_showgrid", True)})
+    # Update number of ticks on xaxis
+    if plt_config.get("xaxis_nticks", None) is not None:
+        fig.update_xaxes(nticks=plt_config["xaxis_nticks"])
 
     # Add subplot titles
     axes_domains = []
