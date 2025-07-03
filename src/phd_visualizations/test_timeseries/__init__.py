@@ -964,7 +964,8 @@ def experimental_results_plot(
 
     fig.update_layout(
         title_text=title_text,
-        title_x=0.05,  # Title position, 0 is left, 1 is right
+        title_x=plt_config.get("title_x", 0.05),  # Title position, 0 is left, 1 is right
+        title_y=plt_config.get("title_y", None),
         height=height,
         width=width,
         # plot_bgcolor='#ffffff',
