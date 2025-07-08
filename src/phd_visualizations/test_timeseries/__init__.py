@@ -606,7 +606,8 @@ def experimental_results_plot(
             'anchor': f'x{axes_idx}', 
             'title': title,
             'showgrid': True,
-            "autorange": False
+            "autorange": False,
+            "nticks": conf.get("ynticks_left", None),
         }
 
         # Plot configuration
@@ -900,9 +901,15 @@ def experimental_results_plot(
             for pos_idx, traces_config in enumerate(axis_right_configs):
                 titles = conf.get('ylabels_right', [None] * len(traces_config))
 
-                yaxes_settings[f'yaxis{idx}'] = dict(overlaying=overlaying_axis, side='right', showgrid=False,
-                                                     anchor='free', position=yaxis_right_pos[pos_idx],
-                                                     title=titles[pos_idx])
+                yaxes_settings[f'yaxis{idx}'] = dict(
+                    overlaying=overlaying_axis, 
+                    side='right', 
+                    showgrid=False,
+                    anchor='free', 
+                    position=yaxis_right_pos[pos_idx],
+                    title=titles[pos_idx],
+                    nticks=conf.get("ynticks_right", None),
+                )
 
                 for trace_idx, trace_conf in enumerate(traces_config):
 
