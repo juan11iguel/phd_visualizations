@@ -1,3 +1,4 @@
+from typing import Optional, Literal
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -16,6 +17,7 @@ def regression_plot(
     alternative_labels: list[str] = None,
     show_error_metrics: bool = True,
     var_labels: list[str] = None,
+    legend_pos: Optional[Literal["side", "top"]] = None,
     **kwargs
 ) -> go.Figure:
     
@@ -31,6 +33,13 @@ def regression_plot(
     kwargs.setdefault('title_text', "Model validation")
     kwargs.setdefault('height', 300 * len(var_ids))
     kwargs.setdefault('font', dict(size=default_fontsize))
+    kwargs.setdefault('hovermode', 'x unified')
+    kwargs.setdefault('hoverlabel', dict(
+        bgcolor="white", # "rgb(143, 240, 164, 0.8)",
+        font_size=13,
+        bordercolor="rgba(192, 191, 188,0.8)",
+        namelength=40,
+    ))
 
     # Ensure df_mod is a list
     if not isinstance(df_mod, list):
@@ -76,6 +85,7 @@ def regression_plot(
             fillcolor=color_,
             showlegend=False,
             name=f'Uncertainty {var_id}',
+            hoverinfo='skip',
         )
         lower_bound = go.Scatter(
             x=x,
@@ -138,7 +148,7 @@ def regression_plot(
             y=1.02,
             xanchor="right",
             x=1,
-        ) if len(df_mod) == 1 else dict(
+        ) if (len(df_mod) == 1 and not legend_pos=="side") else dict(
             orientation="v",
             yanchor="top",
             y=1,
