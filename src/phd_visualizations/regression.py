@@ -5,7 +5,10 @@ from plotly.subplots import make_subplots
 from sklearn.metrics import mean_squared_error
 import numpy as np
 from phd_visualizations.calculations import calculate_uncertainty, SupportedInstruments
-from phd_visualizations.constants import default_fontsize, plt_colors, symbols_open as symbols
+from phd_visualizations.constants import (default_fontsize, 
+                                          plt_colors, 
+                                          symbols_open as symbols,
+                                          color_palette)
 from phd_visualizations.utils import hex_to_rgba_str
 
 def regression_plot(
@@ -36,11 +39,35 @@ def regression_plot(
     kwargs.setdefault('font', dict(size=default_fontsize))
     kwargs.setdefault('hovermode', 'x unified')
     kwargs.setdefault('hoverlabel', dict(
-        bgcolor="white", # "rgb(143, 240, 164, 0.8)",
+        bgcolor="white",  # "rgb(143, 240, 164, 0.8)",
         font_size=13,
         bordercolor="rgba(192, 191, 188,0.8)",
         namelength=40,
     ))
+    
+    if legend_pos == "top":
+        legend_items = dict(
+            legend_orientation="h",
+            legend_yanchor="bottom",
+            legend_y=1.02,
+            legend_xanchor="right",
+            legend_x=1,
+        )
+    elif legend_pos == "side":
+        legend_items = dict(
+            legend_orientation="v",
+            legend_yanchor="top",
+            legend_y=1,
+            legend_xanchor="left",
+            legend_x=1,
+            legend_font=dict(size=default_fontsize - 4)
+        )
+    else:
+        raise ValueError("legend_pos must be either 'top' or 'side'")
+    
+    [kwargs.setdefault(k, v) for k, v in legend_items.items()]
+    
+    # print(kwargs)
 
     # Ensure df_mod is a list
     if not isinstance(df_mod, list):
@@ -133,7 +160,7 @@ def regression_plot(
             mode='lines',
             name='Perfect fit',
             showlegend=(i == 0),
-            line=dict(color=plt_colors[0], width=2),
+            line=dict(color=color_palette["dark_gray"], width=2),
         )
         fig.add_trace(regression_line, row=i + 1, col=1)
 
@@ -149,20 +176,6 @@ def regression_plot(
         )
 
     fig.update_layout(
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1,
-        ) if (len(df_mod) == 1 and not legend_pos=="side") else dict(
-            orientation="v",
-            yanchor="top",
-            y=1,
-            xanchor="left",
-            x=1,
-            font=dict(size=default_fontsize - 4)
-        ),
         **kwargs,
     )
 

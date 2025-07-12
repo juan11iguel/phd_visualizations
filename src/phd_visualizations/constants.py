@@ -38,6 +38,7 @@ color_palette = OrderedDict({
     "wct_purple": "#9573a6",
     "c_blue": "#6c8ebf",
     "turquesa": "#00A08B",
+    "dark_gray": "#333333",
 })
 
 
