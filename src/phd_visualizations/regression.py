@@ -10,6 +10,7 @@ from phd_visualizations.constants import (default_fontsize,
                                           symbols_open as symbols,
                                           color_palette)
 from phd_visualizations.utils import hex_to_rgba_str
+from phd_visualizations.super_makers import add_super_scatter_trace, SuperMarker
 
 def regression_plot(
     df_ref: pd.DataFrame,
@@ -21,7 +22,9 @@ def regression_plot(
     show_error_metrics: bool = True,
     inline_error_metrics_text: bool = False,
     var_labels: list[str] = None,
-    legend_pos: Optional[Literal["side", "top"]] = None,
+    legend_pos: Optional[Literal["side", "top", "top_spaced"]] = None,
+    super_marker: Optional[SuperMarker] = None,
+    title_margin: int = 100,
     **kwargs
 ) -> go.Figure:
     
@@ -31,11 +34,19 @@ def regression_plot(
         units = [None] * len(var_ids)
     if var_labels is None:
         var_labels = var_ids
+        
+    # width = kwargs.get("width", 600)
+    v_spacing = kwargs.get("v_spacing", 0.08)
+    n_rows = len(var_ids)
+    kwargs.setdefault('width', 600)
+    height = int(n_rows * kwargs["width"] + (n_rows - 1) * (kwargs["width"] * v_spacing) + title_margin)
 
+    kwargs.setdefault('height', height)
+    kwargs.setdefault('margin', dict(l=10, r=10, t=title_margin, b=10))
     kwargs.setdefault('template', 'plotly_white')
+    kwargs.setdefault('hoverlabel_namelength', -1) # Show full variable names in hover
     kwargs.setdefault('showlegend', True)
     kwargs.setdefault('title_text', "Model validation")
-    kwargs.setdefault('height', 300 * len(var_ids))
     kwargs.setdefault('font', dict(size=default_fontsize))
     kwargs.setdefault('hovermode', 'x unified')
     kwargs.setdefault('hoverlabel', dict(
@@ -61,6 +72,16 @@ def regression_plot(
             legend_xanchor="left",
             legend_x=1,
             legend_font=dict(size=default_fontsize - 4)
+        )
+    elif legend_pos == "top_spaced":
+        legend_items = dict(
+            legend_orientation="h",
+            legend_yanchor="bottom",
+            legend_y=1.02,
+            legend_xanchor="center",
+            legend_x=0.5,
+            legend_font=dict(size=12),
+            legend_valign="middle",
         )
     else:
         raise ValueError("legend_pos must be either 'top' or 'side'")
@@ -92,6 +113,9 @@ def regression_plot(
         rows=len(var_ids),
         cols=1,
         subplot_titles=subplot_titles,
+        vertical_spacing=.1,
+        # column_widths=[width] * len(var_ids),
+        # row_heights=[width] * len(var_ids),
     )
 
     for i, var_id in enumerate(var_ids):
@@ -138,20 +162,44 @@ def regression_plot(
         # Add scatter for each df_mod
         for j, df_mod_j in enumerate(df_mod):
             y = df_mod_j[var_id].values[sorted_indices]
-            scatter = go.Scatter(
-                x=x,
-                y=y,
-                mode='markers',
-                name=alternative_labels[j] if alternative_labels is not None else 'Model results',
-                showlegend=(i == 0),
-                marker=dict(
-                    color=plt_colors[j],
-                    size=8,
-                    symbol=symbols[j % len(symbols)],
-                ),
-                legendgroup=f"model{j}",
-            )
-            fig.add_trace(scatter, row=i + 1, col=1)
+            name = alternative_labels[j] if alternative_labels is not None else 'Model results'
+            
+            if super_marker is None:
+                scatter = go.Scatter(
+                    x=x,
+                    y=y,
+                    mode='markers',
+                    name=name,
+                    showlegend=(i == 0),
+                    marker=dict(
+                        color=plt_colors[j],
+                        size=8,
+                        symbol=symbols[j % len(symbols)],
+                    ),
+                    legendgroup=f"model{j}",
+                )
+                fig.add_trace(scatter, row=i + 1, col=1)
+            else:
+                fig = add_super_scatter_trace(
+                    fig,
+                    x=x,
+                    y=y,
+                    trace_label=name,
+                    size_var_vals=df_ref[super_marker.size_var_id].values,
+                    size_var_range=super_marker.size_var_range,
+                    fill_var_vals=df_ref[super_marker.fill_var_id].values if super_marker.fill_var_id else None,
+                    fill_var_range=super_marker.fill_var_range,
+                    ring_vars_vals=[df_ref[var_id].values for var_id in super_marker.ring_vars_ids] if super_marker.ring_vars_ids else None,
+                    ring_labels=super_marker.ring_labels if super_marker.ring_labels is not None else super_marker.ring_vars_ids,
+                    size_label=super_marker.size_label if super_marker.size_label else super_marker.size_var_id,
+                    fill_label=super_marker.fill_label if super_marker.fill_label else super_marker.fill_var_id,
+                    marker_params=super_marker.params,
+                    row=i + 1,
+                    col=1,
+                    xref=f"{i+1 if i > 0 else ''}",
+                    yref=f"{i+1 if i > 0 else ''}",
+                    showlegend=True if i== 0 else False,
+                )
 
         # Perfect fit line
         regression_line = go.Scatter(
@@ -168,11 +216,13 @@ def regression_plot(
             title_text=f"Predicted values [{units[i] if units else ''}]",
             row=i + 1,
             col=1,
+            range=[x.min() - 0.1 * x.std(), x.max() + 0.1 * x.std()],
         )
         fig.update_xaxes(
             title_text=f"Experimental values [{units[i] if units else ''}]",
             row=i + 1,
             col=1,
+            range=[x.min() - 0.1 * x.std(), x.max() + 0.1 * x.std()],
         )
 
     fig.update_layout(
