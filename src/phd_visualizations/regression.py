@@ -16,6 +16,7 @@ def regression_plot(
     instruments: list[SupportedInstruments] = None,
     alternative_labels: list[str] = None,
     show_error_metrics: bool = True,
+    inline_error_metrics_text: bool = False,
     var_labels: list[str] = None,
     legend_pos: Optional[Literal["side", "top"]] = None,
     **kwargs
@@ -51,13 +52,19 @@ def regression_plot(
             for var_id in var_ids
         ]
         
+        separator_str = "<br>" if not inline_error_metrics_text else " | "
+        subplot_titles=[
+            f"<b>{var_label}</b>{separator_str}RMSE={rmse:.2f} [{unit}]"
+            for var_label, rmse, unit in zip(var_labels, rmse_list, units)
+        ]
+            
+    else:
+        subplot_titles = [f"<b>{var_label}</b>" for var_label in var_labels]
+        
     fig = make_subplots(
         rows=len(var_ids),
         cols=1,
-        subplot_titles=[
-            f"<b>{var_label}</b><br>RMSE={rmse:.2f} [{unit}]"
-            for var_label, rmse, unit in zip(var_labels, rmse_list, units)
-        ] if show_error_metrics else [f"<b>{var_label}</b>" for var_label in var_labels],
+        subplot_titles=subplot_titles,
     )
 
     for i, var_id in enumerate(var_ids):
