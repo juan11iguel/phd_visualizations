@@ -97,11 +97,12 @@ def add_super_scatter_trace(
 
             # Add full outer circle (base)
             fig.add_shape(
+                layer="between",
                 type="circle",
                 x0=cx - r_outer, y0=cy - r_outer,
                 x1=cx + r_outer, y1=cy + r_outer,
                 fillcolor=mp.ring_colors[0],
-                # layer="below",
+                # layer="between",
                 line=dict(width=0),  # Disable the line
                 showlegend=True if (idx == 0 and showlegend) else False,  # Show legend only for the first donut
                 name=ring_labels[0] if idx == 0 else "",
@@ -111,6 +112,7 @@ def add_super_scatter_trace(
 
             # Add partial arc segment (on top of base)
             fig.add_shape(
+                layer="between",
                 type="path",
                 path=path,
                 fillcolor=mp.ring_colors[1],
@@ -131,6 +133,7 @@ def add_super_scatter_trace(
             fillcolor = mp.fill_var_colors[-1]
 
         fig.add_shape(
+            layer="between",
             type="circle",
             x0=cx - r_inner, y0=cy - r_inner,
             x1=cx + r_inner, y1=cy + r_inner,
@@ -143,6 +146,7 @@ def add_super_scatter_trace(
 
         # Add inner filled circle (donut hole)
         fig.add_shape(
+            layer="below",
             type="circle",
             x0=cx - max_radius, y0=cy - max_radius,
             x1=cx + max_radius, y1=cy + max_radius,
@@ -163,10 +167,10 @@ def add_super_scatter_trace(
             name=trace_label,
             mode="markers",
             marker=dict(
-                size=0.1,  # Small size to avoid clutter
-                color=fillcolor,
+                size=5,  # Small size to avoid clutter
+                color="#333333",
                 # symbol="circle",
-                opacity=1,
+                # opacity=1,
             ),
             showlegend=False,
         ),
