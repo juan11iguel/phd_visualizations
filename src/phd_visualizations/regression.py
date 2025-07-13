@@ -217,13 +217,13 @@ def regression_plot(
             title_text=f"Predicted values [{units[i] if units else ''}]",
             row=i + 1,
             col=1,
-            range=[x.min() - 0.1 * x.std(), x.max() + 0.1 * x.std()],
+            range=[x.min() - 0.1 * x.std(), x.max() + 0.1 * x.std()] if super_marker else None,
         )
         fig.update_xaxes(
             title_text=f"Experimental values [{units[i] if units else ''}]",
             row=i + 1,
             col=1,
-            range=[x.min() - 0.1 * x.std(), x.max() + 0.1 * x.std()],
+            range=[x.min() - 0.1 * x.std(), x.max() + 0.1 * x.std()] if super_marker else None,
         )
 
     fig.update_layout(
