@@ -25,6 +25,7 @@ def regression_plot(
     legend_pos: Optional[Literal["side", "top", "top_spaced"]] = None,
     super_marker: Optional[SuperMarker] = None,
     title_margin: int = 100,
+    vertical_spacing: float = .1,
     **kwargs
 ) -> go.Figure:
     
@@ -113,7 +114,7 @@ def regression_plot(
         rows=len(var_ids),
         cols=1,
         subplot_titles=subplot_titles,
-        vertical_spacing=.1,
+        vertical_spacing=vertical_spacing,
         # column_widths=[width] * len(var_ids),
         # row_heights=[width] * len(var_ids),
     )
