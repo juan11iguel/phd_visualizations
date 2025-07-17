@@ -2,9 +2,13 @@ from typing import Optional, Literal
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from sklearn.metrics import mean_squared_error
 import numpy as np
-from phd_visualizations.calculations import calculate_uncertainty, SupportedInstruments
+from loguru import logger
+from phd_visualizations.calculations import (calculate_uncertainty, 
+                                             SupportedInstruments,
+                                             calculate_metrics,
+                                             MetricNames,
+                                             MetricsDict)
 from phd_visualizations.constants import (default_fontsize, 
                                           plt_colors, 
                                           symbols_open as symbols,
@@ -19,7 +23,7 @@ def regression_plot(
     units: list[str] = None,
     instruments: list[SupportedInstruments] = None,
     alternative_labels: list[str] = None,
-    show_error_metrics: bool = True,
+    show_error_metrics: Optional[list[MetricNames]] = None,
     inline_error_metrics_text: bool = False,
     var_labels: list[str] = None,
     legend_pos: Optional[Literal["side", "top", "top_spaced"]] = None,
@@ -95,17 +99,43 @@ def regression_plot(
     if not isinstance(df_mod, list):
         df_mod = [df_mod]
 
-    if show_error_metrics:
-        rmse_list = [
-            np.sqrt(mean_squared_error(df_ref[var_id].values, df_mod[0][var_id].values))
+    if show_error_metrics is not None:
+        if len(df_mod) > 1:
+            logger.warning(
+                "Multiple model results provided, but error metrics will be calculated only for the first model."
+            )
+
+        metrics_dicts = [
+            calculate_metrics(
+                y_true=df_ref[var_id].values,
+                y_pred=df_mod[0][var_id].values,
+                metrics=show_error_metrics
+            )
             for var_id in var_ids
         ]
-        
+
         separator_str = "<br>" if not inline_error_metrics_text else " | "
-        subplot_titles=[
-            f"<b>{var_label}</b>{separator_str}RMSE={rmse:.2f} [{unit}]"
-            for var_label, rmse, unit in zip(var_labels, rmse_list, units)
-        ]
+
+        subplot_titles = []
+        for var_label, metrics_dict, unit in zip(var_labels, metrics_dicts, units):
+            metric_str_parts = []
+            for metric_key, value in metrics_dict.items():
+                label = MetricsDict[metric_key]["label"]
+                unit_type = MetricsDict[metric_key]["unit"]
+
+                # Resolve unit: "idem" -> same as `unit`, "idem_squared" -> f"{unit}²"
+                if unit_type == "idem":
+                    display_unit = unit
+                elif unit_type == "idem_squared":
+                    display_unit = f"{unit}<sup>2</sup>"
+                else:
+                    display_unit = unit_type
+
+                metric_str_parts.append(f"{label}={value:.2f} [{display_unit}]")
+
+            metric_str = separator_str.join(metric_str_parts)
+            title = f"<b>{var_label}</b>{separator_str}{metric_str}"
+            subplot_titles.append(title)
             
     else:
         subplot_titles = [f"<b>{var_label}</b>" for var_label in var_labels]

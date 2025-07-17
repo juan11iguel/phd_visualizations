@@ -1,6 +1,16 @@
 from enum import Enum
-# import numpy as np
+import numpy as np
+from typing import Literal
 
+MetricNames = Literal["rmse", "mape", "mae", "r2", "nrmse_mean", "nrmse_range"]
+MetricsDict: dict[str, dict[str, str]] = {
+    "rmse": {"label": "RMSE", "unit": "idem_squared"},
+    "mape": {"label": "MAPE", "unit": "%"},
+    "mae": {"label": "MAE", "unit": "idem"},
+    "r2": {"label": "R²", "unit": "-"},
+    "nrmse_mean": {"label": "NRMSE (mean)", "unit": "-"},
+    "nrmse_range": {"label": "NRMSE (range)", "unit": "-"},
+}
 
 class SupportedInstruments(Enum):
     pt100 = "pt100" 
@@ -34,7 +44,7 @@ def calculate_uncertainty(value: float, instrument: SupportedInstruments | str) 
     elif instrument == SupportedInstruments.paddle_wheel_flow_meter:
         return 0.5e-2 * 1.95 + 2.5e-2 * value  # 0.5% full scale + 2.5% of reading
     else:
-        raise ValueError(f'Instrument {instrument} not supported, supported instruments are {supported_instruments}')
+        raise ValueError(f'Instrument {instrument} not supported, supported instruments are {SupportedInstruments.__members__.keys()}')
 
 
 # From med-performance-evaluation/med_evaluation
@@ -127,3 +137,50 @@ def calculate_uncertainty(value: float, instrument: SupportedInstruments | str) 
 #         raise ValueError(f'Unknown instrument {instrument}')
 #
 #     return meas_uncertainty
+
+
+
+def calculate_r2(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    return 1 - np.sum((y_true - y_pred) ** 2) / np.sum((y_true - np.mean(y_true)) ** 2)
+
+def calculate_rmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    return np.sqrt(((y_true - y_pred) ** 2).mean())
+
+def calculate_mae(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    return np.mean(np.abs(y_true - y_pred))
+
+def calculate_mape(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    return np.mean(100 * np.abs(y_true - y_pred) / y_true)
+
+def calculate_nrmse_mean(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    """Normalized RMSE by mean of y_true."""
+    rmse = calculate_rmse(y_true, y_pred)
+    return rmse / np.mean(y_true)
+
+def calculate_nrmse_range(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    """Normalized RMSE by range of y_true."""
+    rmse = calculate_rmse(y_true, y_pred)
+    return rmse / (np.max(y_true) - np.min(y_true))
+
+def calculate_metrics(
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    metrics: list[MetricNames]
+) -> dict[str, float]:
+    
+    available_metrics: dict[str, callable] = {
+        "r2": calculate_r2,
+        "rmse": calculate_rmse,
+        "mae": calculate_mae,
+        "mape": calculate_mape,
+        "nrmse_mean": calculate_nrmse_mean,
+        "nrmse_range": calculate_nrmse_range,
+    }
+
+    results: dict[str, float] = {}
+    for metric in metrics:
+        if metric in available_metrics:
+            results[metric] = available_metrics[metric](y_true, y_pred)
+        else:
+            raise ValueError(f"Unsupported metric: {metric}")
+    return results
