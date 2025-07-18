@@ -412,7 +412,7 @@ def experimental_results_plot(
     vertical_spacing = plt_config.get("vertical_spacing", 0.03)
     # reduced_vs = vertical_spacing / 3
     xdomain = plt_config.get("xdomain", [0, 0.85])
-    yaxis_right_pos = plt_config.get("yaxis_right_pos", [.86, .95])
+    yaxis_right_pos = plt_config.get("yaxis_right_pos", [xdomain[-1]+0.01, xdomain[-1]+0.1])
     height = plt_config["height"]
     width = plt_config["width"]
     arrow_xrel_pos = plt_config.get("arrow_xrel_pos", 20)
