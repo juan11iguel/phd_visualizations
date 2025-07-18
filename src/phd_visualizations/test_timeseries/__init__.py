@@ -967,7 +967,7 @@ def experimental_results_plot(
 
     if title_text is None:
         # Get from plot configuration
-        title_text = f"<b>{plt_config.get('title', None)}</b><br>{plt_config.get('subtitle', None)}</br>"
+        title_text = f"<b>{plt_config.get('title', '')}</b><br>{plt_config.get('subtitle', '')}</br>"
 
     fig.update_layout(
         title_text=title_text,
