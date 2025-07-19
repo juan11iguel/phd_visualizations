@@ -7,10 +7,24 @@ def generate_latex_table(
     data: list[dict[str, Any]], 
     submetric_ids: list[str] = [], 
     group_row_ids: Optional[list[str]] = None, 
-    submetric_labels: Optional[list[str]] = None
+    submetric_labels: Optional[list[str]] = None,
+    group_submetric_ids: Optional[list[str]] = None
 ) -> str:
     """
     Generate a LaTeX table string with multirow/multicolumn headers for metrics and submetrics.
+
+    Args:
+        regular_col_ids: List of column IDs for regular (non-metric) columns
+        regular_col_labels: List of LaTeX-formatted labels for regular columns
+        metric_info: Dictionary mapping metric IDs to their LaTeX-formatted labels
+        data: List of dictionaries containing the table data
+        submetric_ids: List of submetric IDs (optional)
+        group_row_ids: List of column IDs to group with multirow when consecutive rows have same values (optional)
+        submetric_labels: List of LaTeX-formatted labels for submetrics (optional)
+        group_submetric_ids: List of submetric IDs to group with multirow when consecutive rows have same values (optional)
+
+    Returns:
+        LaTeX table string
 
     Example usage:
 
@@ -118,6 +132,71 @@ def generate_latex_table(
                         col_num += 1
         
         return positions, metric_positions
+
+    def find_row_groups():
+        """
+        Find groups of consecutive rows that have the same values for group_row_ids columns.
+        Returns a list of (start_idx, group_size) tuples for each group.
+        """
+        if not group_row_ids:
+            return []
+        
+        groups = []
+        i = 0
+        while i < len(data):
+            # Start a new group
+            group_start = i
+            group_values = {col_id: data[i].get(col_id, "") for col_id in group_row_ids}
+            
+            # Find consecutive rows with same values
+            j = i + 1
+            while j < len(data):
+                current_values = {col_id: data[j].get(col_id, "") for col_id in group_row_ids}
+                if current_values != group_values:
+                    break
+                j += 1
+            
+            group_size = j - i
+            groups.append((group_start, group_size))
+            i = j
+        
+        return groups
+
+    def find_submetric_groups():
+        """
+        Find groups of consecutive rows that have the same values for group_submetric_ids submetrics.
+        Returns a dictionary mapping (metric_id, submetric_id) to list of (start_idx, group_size) tuples.
+        """
+        if not group_submetric_ids:
+            return {}
+        
+        submetric_groups = {}
+        
+        for metric_id in metric_keys:
+            for submetric_id in group_submetric_ids:
+                if submetric_id in submetric_ids:
+                    groups = []
+                    i = 0
+                    while i < len(data):
+                        # Start a new group
+                        group_start = i
+                        group_value = data[i].get("metrics", {}).get(metric_id, {}).get(submetric_id, "")
+                        
+                        # Find consecutive rows with same values
+                        j = i + 1
+                        while j < len(data):
+                            current_value = data[j].get("metrics", {}).get(metric_id, {}).get(submetric_id, "")
+                            if current_value != group_value:
+                                break
+                            j += 1
+                        
+                        group_size = j - i
+                        groups.append((group_start, group_size))
+                        i = j
+                    
+                    submetric_groups[(metric_id, submetric_id)] = groups
+        
+        return submetric_groups
 
     n_regular = len(regular_col_ids)
     n_metrics = len(metric_info)
@@ -264,13 +343,48 @@ def generate_latex_table(
     header.append(" \\\\" + "".join(clines))
 
     # Data rows
+    row_groups = find_row_groups()
+    submetric_groups = find_submetric_groups()
+    
+    # Create a mapping of row index to group info for quick lookup
+    row_to_group = {}
+    for group_start, group_size in row_groups:
+        for i in range(group_start, group_start + group_size):
+            row_to_group[i] = (group_start, group_size)
+    
+    # Create mappings for submetric groups
+    submetric_row_to_group = {}
+    for (metric_id, submetric_id), groups in submetric_groups.items():
+        submetric_row_to_group[(metric_id, submetric_id)] = {}
+        for group_start, group_size in groups:
+            for i in range(group_start, group_start + group_size):
+                submetric_row_to_group[(metric_id, submetric_id)][i] = (group_start, group_size)
+    
     data_rows = []
-    for row in data:
+    for row_idx, row in enumerate(data):
         row_cells = []
         
         # Add regular columns with spacing
         for i, col in enumerate(regular_col_ids):
-            row_cells.append(str(row.get(col, "")))
+            value = str(row.get(col, ""))
+            
+            # Check if this column should be grouped and if this is the first row of a group
+            if group_row_ids and col in group_row_ids and row_idx in row_to_group:
+                group_start, group_size = row_to_group[row_idx]
+                
+                if row_idx == group_start and group_size > 1:
+                    # First row of a group - use multirow
+                    row_cells.append(f"\\multirow{{{group_size}}}{{*}}{{{value}}}")
+                elif row_idx > group_start:
+                    # Subsequent rows of a group - empty cell
+                    row_cells.append("")
+                else:
+                    # Single row group - normal cell
+                    row_cells.append(value)
+            else:
+                # Normal cell (not grouped)
+                row_cells.append(value)
+                
             if i < n_regular - 1:  # Add empty spacer between regular columns
                 row_cells.append("")
         
@@ -284,7 +398,28 @@ def generate_latex_table(
             if n_submetrics > 0:
                 for m_idx, m in enumerate(metric_keys):
                     for s_idx, s in enumerate(submetric_ids):
-                        row_cells.append(str(metrics.get(m, {}).get(s, "")))
+                        value = str(metrics.get(m, {}).get(s, ""))
+                        
+                        # Check if this submetric should be grouped
+                        if (group_submetric_ids and s in group_submetric_ids and 
+                            (m, s) in submetric_row_to_group and 
+                            row_idx in submetric_row_to_group[(m, s)]):
+                            
+                            group_start, group_size = submetric_row_to_group[(m, s)][row_idx]
+                            
+                            if row_idx == group_start and group_size > 1:
+                                # First row of a group - use multirow
+                                row_cells.append(f"\\multirow{{{group_size}}}{{*}}{{{value}}}")
+                            elif row_idx > group_start:
+                                # Subsequent rows of a group - empty cell
+                                row_cells.append("")
+                            else:
+                                # Single row group - normal cell
+                                row_cells.append(value)
+                        else:
+                            # Normal cell (not grouped)
+                            row_cells.append(value)
+                            
                         # Add empty spacer between submetrics and between metrics
                         if s_idx < n_submetrics - 1 or m_idx < n_metrics - 1:
                             row_cells.append("")
