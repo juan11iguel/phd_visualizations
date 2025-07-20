@@ -9,15 +9,26 @@ import copy
 import pandas as pd
 import numpy as np
 import datetime
-from typing import Literal
+from typing import Literal, Optional, Iterable
 import re
+from itertools import product
 import plotly
 import plotly.graph_objects as go
 from loguru import logger
-from phd_visualizations.constants import color_palette, default_fontsize, newshape_style, ArrayLike, named_css_colors, dash_types
+from phd_visualizations.constants import (color_palette, 
+                                          default_fontsize,
+                                          newshape_style,
+                                          named_css_colors,
+                                          dash_types)
 from phd_visualizations.calculations import calculate_uncertainty
-from phd_visualizations.utils import tuple_to_string, ColorChooser, Operators, hex_to_rgba_str
-from plotly.colors import hex_to_rgb, qualitative
+from phd_visualizations.utils import (tuple_to_string, 
+                                      ColorChooser, 
+                                      Operators, 
+                                      hex_to_rgba_str,
+                                      rgb_str_to_rgba_str,
+                                      hex_to_rgb_str,
+                                      any_str_to_rgb_str)
+from plotly.colors import qualitative, find_intermediate_color
 
 logger.disable(__name__)
 
@@ -27,6 +38,10 @@ color_chooser = ColorChooser([
     color_palette['plotly_red']
 ])
 
+# Compare traces parameters
+n_intermediate_colors: int = 5 
+comp_end_color: str = "#3D3846"
+comp_opacity: float = 0.8
 
 def add_trace(
     fig: go.Figure, 
@@ -36,16 +51,16 @@ def add_trace(
     xaxes_idx: int,
     resample: bool, 
     show_arrow: bool = False, 
-    trace_color: str = None, 
-    uncertainty: ArrayLike = None,
-    row_idx: int = None,
+    trace_color: Optional[str] = None, 
+    uncertainty: Optional[Iterable] = None,
+    row_idx: Optional[int] = None,
     axis_side: Literal['left', 'right'] = 'left', 
-    arrow_xrel_pos: int = None, 
-    var_config: dict = None,
-    df_comp: list[pd.DataFrame] = None,
+    var_config: Optional[dict] = None,
+    df_comp: Optional[list[pd.DataFrame]] = None,
+    comp_labels: Optional[list[str]] = None,
     index_adaptation_policy: Literal['adapt_to_ref', 'combine'] = 'adapt_to_ref',
-    legend_id: str = None,
-    legend_yaxis_indicator: str = None,
+    legend_id: Optional[str] = None,
+    legend_yaxis_indicator: Optional[str] = None,
     **kwargs
 ) -> go.Figure:
     """ Add custom trace to plotly figure, it can include:
@@ -64,6 +79,11 @@ def add_trace(
     else:
         color = None
 
+    # Set trace color with opacity if specified
+    if color is not None and 'opacity' in trace_conf:
+        if not color.startswith("rgba"):
+            color = hex_to_rgba_str(color, alpha=trace_conf['opacity'])
+    
     showlegend = trace_conf.get('showlegend', False)
     legend = None
     if showlegend:
@@ -87,6 +107,7 @@ def add_trace(
         name = trace_conf.get('var_id', None)
     if legend_yaxis_indicator is not None:
         name = f"{name} {legend_yaxis_indicator}"
+
 
     # if name is None:
     #     raise KeyError(f'No name for variable {} could be found in any of the available options')
@@ -144,7 +165,23 @@ def add_trace(
     # Add comparison trace(s)
     customdata = None
     if df_comp is not None:
-        N_comp = len(df_comp)
+        # N_comp = len(df_comp)
+
+        # Generate compare colors
+        color_list = [
+            rgb_str_to_rgba_str(
+                find_intermediate_color(
+                    any_str_to_rgb_str(color), 
+                    hex_to_rgb_str(comp_end_color), 
+                    i / (n_intermediate_colors - 1), colortype='rgb'
+                ),
+                alpha=comp_opacity
+            )
+            for i in range(n_intermediate_colors)
+        ]
+        
+        color_comp_list, dash_comp_list = zip( *product(color_list, dash_types[1:]) )
+        
         # default = np.ones(df[trace_conf['var_id']].shape)*np.nan
         # The comparison data provided is a list of dataframes, which might or might not include data for the specified variable
         customdata = []
@@ -186,21 +223,22 @@ def add_trace(
     hovertemplate = "%{y:.2f}"
     if customdata is not None and not all(element is None for element in customdata):
         customdata = np.stack(customdata, axis=-1)
-
+        
         # hovertemplate = "%{y:.2f} (<span style='color:gray'> %{customdata:.2f} </span>)"
         hovertemplate = "%{y:.2f} "
         for i in range(customdata.shape[1]):
+            comp_name = f"{name} comp. {i}" if comp_labels is None else f"{name} {comp_labels[i]}"
             comp = customdata[:, i]
             if comp is not None:
 
                 plotly_resample_kwargs_comp = {'hf_x': df.index, 'hf_y': comp} if resample else {}
 
-                hovertemplate += f"(<span style='color:{named_css_colors[i]}'> %{{customdata[{i}]:.2f}} </span>) "
+                hovertemplate += f"(<span style='color:{color_comp_list[i]}'> %{{customdata[{i}]:.2f}} </span>) "
 
-                if (i > 0 and color is None) or N_comp > 1:
-                    color_comp = named_css_colors[i]
-                else:
-                    color_comp = color
+                # if (i > 0 and color is None) or N_comp > 1:
+                #     color_comp = named_css_colors[i]
+                # else:
+                #     color_comp = color
                     
                 stackgroup_comp = kwargs.get('stackgroup', None)
                 if stackgroup_comp is not None:
@@ -211,14 +249,15 @@ def add_trace(
                     go.Scatter(
                         x=df.index if not resample else None,
                         y=comp if not resample else None,
-                        name=f"{name} comparison {i}",
+                        name=comp_name,
                         mode='lines',
                         line=dict(
-                            color=color_comp,
-                            dash='dot',
+                            color=color_comp_list[i],
+                            dash= dash_comp_list[i],
                             width=2
                         ),
-                        showlegend=False,
+                        showlegend=showlegend,
+                        legend=legend,
                         xaxis=f'x{xaxes_idx}',
                         yaxis=f'y{yaxes_idx}',
                         # Hide tooltip
@@ -251,11 +290,6 @@ def add_trace(
 
     # Add trace
     plotly_resample_kwargs = {'hf_x': df.index, 'hf_y': df[trace_conf['var_id']]} if resample else {}
-
-    # Set trace color with opacity if specified
-    if color is not None and 'opacity' in trace_conf:
-        if not color.startswith("rgba"):
-            color = hex_to_rgba_str(color, alpha=trace_conf['opacity'])
 
     width = trace_conf.get('width', 2)
     if df_comp is not None:
@@ -364,15 +398,16 @@ def add_trace(
 def experimental_results_plot(
     plt_config: dict, 
     df: pd.DataFrame, 
-    df_opt: pd.DataFrame | None = None, # TODO: Should be removed
-    df_comp: pd.DataFrame | list[pd.DataFrame] = None, 
-    title_text: str = None,
+    df_opt: Optional[pd.DataFrame] = None, # TODO: Should be removed
+    df_comp: Optional[pd.DataFrame | list[pd.DataFrame]] = None, 
+    comp_trace_labels: Optional[list[str]] = None,
+    title_text: Optional[str] = None,
     resample: bool = True, 
-    vars_config: dict = None,
+    vars_config: Optional[dict] = None,
     index_adaptation_policy: Literal['adapt_to_ref', 'combine'] = 'adapt_to_ref',
     reset_colors_per_plot: bool = False,
     legend_yaxis_indicator_symbols: tuple[str, str] = ("❮", "❯"),
-    template: str = None,
+    template: Optional[str] = None,
 ) -> go.Figure:
     
     """ Generate plotly figure with experimental results
@@ -393,6 +428,9 @@ def experimental_results_plot(
 
     if df_comp is not None and not isinstance(df_comp, list):
         df_comp = [df_comp]
+    if comp_trace_labels is not None:
+        assert len(df_comp) == len(comp_trace_labels), \
+            f'comp_trace_labels must be the same length as df_comp, got {len(df_comp)} and {len(comp_trace_labels)}'
         
     if template is None:
         template = plt_config.get('template', 'custom')
@@ -832,6 +870,7 @@ def experimental_results_plot(
                         var_config=var_config,
                         trace_color=trace_color,  # To assign a different color to each trace
                         df_comp=df_comp,
+                        comp_labels=comp_trace_labels,
                         stackgroup=group if 'fill' in trace_conf else None,
                         index_adaptation_policy=index_adaptation_policy,
                         legend_id=plot_id,
@@ -869,6 +908,7 @@ def experimental_results_plot(
                     arrow_xrel_pos=arrow_xrel_pos, 
                     var_config=var_config, 
                     df_comp=df_comp,
+                    comp_labels=comp_trace_labels,
                     index_adaptation_policy=index_adaptation_policy,
                     legend_id=plot_id,
                     legend_yaxis_indicator=legend_yaxis_indicator
@@ -945,6 +985,7 @@ def experimental_results_plot(
                         arrow_xrel_pos=arrow_xrel_pos, 
                         var_config=var_config,
                         df_comp=df_comp,
+                        comp_labels=comp_trace_labels,
                         index_adaptation_policy=index_adaptation_policy,
                         legend_id=plot_id,
                         legend_yaxis_indicator=legend_yaxis_indicator

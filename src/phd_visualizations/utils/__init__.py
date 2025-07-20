@@ -19,12 +19,58 @@ def validate_hex_color(hex_str: str) -> bool:
         return False
     return True
 
+def hex_to_rgb_str(hex_str: str) -> str:
+    """
+    Convert a hex color string to an RGB string.
+    :param hex_str: Hex color string in the format '#RRGGBB'.
+    :return: RGB string in the format 'rgb(r, g, b)'.
+    """
+    return f'rgb{hex_to_rgb(hex_str)}'
+
 def hex_to_rgba_str(hex_str: str, alpha: float) -> str:
     if not validate_hex_color(hex_str):
         raise ValueError(f"Invalid hex color: {hex_str}")
 
     rgb_col = hex_to_rgb(hex_str)
     return f"rgba({rgb_col[0]}, {rgb_col[1]}, {rgb_col[2]}, {alpha})"
+
+def rgb_str_to_rgba_str(rgb_str: str, alpha: float) -> str:
+    """
+    Convert an RGB string to an RGBA string with the specified alpha value.
+    :param rgb_str: RGB string in the format 'rgb(r, g, b)'.
+    :param alpha: Alpha value to set in the RGBA string.
+    :return: RGBA string in the format 'rgba(r, g, b, alpha)'.
+    """
+    if not rgb_str.startswith('rgb(') or not rgb_str.endswith(')'):
+        raise ValueError(f"Invalid RGB string format: {rgb_str}")
+    
+    rgb_values = rgb_str[4:-1].split(',')
+    return f"rgba({rgb_values[0]}, {rgb_values[1]}, {rgb_values[2]}, {alpha})"
+
+def rgba_str_to_rgb_str(rgba_str: str) -> str:
+    """
+    Convert an RGBA string to an RGB string by removing the alpha value.
+    :param rgba_str: RGBA string in the format 'rgba(r, g, b, a)'.
+    :return: RGB string in the format 'rgb(r, g, b)'.
+    """
+    if not rgba_str.startswith('rgba(') or not rgba_str.endswith(')'):
+        raise ValueError(f"Invalid RGBA string format: {rgba_str}")
+    
+    rgb_values = rgba_str[5:-1].split(',')
+    return f"rgb({rgb_values[0]}, {rgb_values[1]}, {rgb_values[2]})"
+
+def any_str_to_rgb_str(color: str) -> str:
+    """
+    Convert a color string to an RGB string.
+    :param color: Color string, can be a hex string, RGBA string.
+    :return: RGB string in the format 'rgb(r, g, b)'.
+    """
+    if validate_hex_color(color):
+        return hex_to_rgb_str(color)
+    elif color.startswith('rgba(') and color.endswith(')'):
+        return rgba_str_to_rgb_str(color)
+    else:
+        raise ValueError(f"Invalid color format: {color}")
 
 class ColorChooser:
     """
