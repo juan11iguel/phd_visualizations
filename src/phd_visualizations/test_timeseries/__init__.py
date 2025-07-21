@@ -618,6 +618,10 @@ def experimental_results_plot(
         # traces = copy.deepcopy(traces_test)
 
         axes_idx = idx if idx > 1 else ""
+        
+        # If xminor is set to True in the figure configuration, unless it is explicitly set to False in the plot configuration
+        xminor = plt_config.get("xminor", False) and conf.get("xminor", True)
+        
         xaxes_settings[f'xaxis{axes_idx}'] = dict(
             anchor=f'y{axes_idx}', 
             matches='x' if idx > 1 and not conf.get("independent_xaxis", False) else None,
@@ -625,7 +629,7 @@ def experimental_results_plot(
             tickcolor="rgba(0,0,0,0)" if row_idx != rows - 1 else None,
             title_text=conf.get("xaxis_title_text", None),
             title_standoff=conf.get("xaxis_title_standoff", None),
-            minor={"showgrid": plt_config.get("xminor", False)},
+            minor={"showgrid": xminor},
         )  # title= idx,
         # print(f"{xaxes_settings=}")
         
@@ -658,8 +662,8 @@ def experimental_results_plot(
                 type="rect", xref=f"x{axes_idx} domain", yref=f"y{axes_idx} domain", opacity=0.1, layer="below",
                 line_width=0,
                 fillcolor=bg_color,
-                x0=-0.01, x1=1.01,
-                y0=-0.01, y1=1.01,
+                x0=-1e-6, x1=1+1e-6,
+                y0=-1e-6, y1=1+1e-6,
             ),
         )
 
@@ -814,7 +818,7 @@ def experimental_results_plot(
                     mode='lines',
                     line=dict(color='rgba(0,0,0,0)'),
                     showlegend=False,
-                    legend=legends_dict["plots"].get("plotly_id", {"plotly_id": None})["plotly_id"],
+                    legend=legends_dict["plots"].get(plot_id, {}).get("plotly_id", None),
                     xaxis=f'x{axes_idx}', yaxis=f'y{axes_idx}',
                 )
             )
