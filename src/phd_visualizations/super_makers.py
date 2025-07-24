@@ -76,6 +76,10 @@ def add_super_scatter_trace(
     # In the caller function, if not explicitly set, just take the column name in the dataframe
 
     for idx in range(len(x)):
+        
+        if np.isnan(x[idx]) or np.isnan(y[idx]):
+            continue
+        
         cx, cy = x[idx], y[idx]  # Center
 
         r_inner = actual_marker_size_range[0] + (size_var_vals[idx] - size_var_range[0]) / (size_var_range[1] - size_var_range[0]) * (actual_marker_size_range[1] - actual_marker_size_range[0])
