@@ -13,7 +13,7 @@ from phd_visualizations.constants import (default_fontsize,
                                           plt_colors, 
                                           symbols_open as symbols,
                                           color_palette)
-from phd_visualizations.utils import hex_to_rgba_str
+from phd_visualizations.utils import hex_to_rgba_str, compute_axis_range
 from phd_visualizations.super_makers import add_super_scatter_trace, SuperMarker
 
 def regression_plot(
@@ -242,18 +242,21 @@ def regression_plot(
             line=dict(color=color_palette["dark_gray"], width=2),
         )
         fig.add_trace(regression_line, row=i + 1, col=1)
+        
+        y_range = compute_axis_range(x) if super_marker else None
+        x_range = compute_axis_range(x) if super_marker else None
 
         fig.update_yaxes(
             title_text=f"Predicted values [{units[i] if units else ''}]",
             row=i + 1,
             col=1,
-            range=[x.min() - 0.1 * x.std(), x.max() + 0.1 * x.std()] if super_marker else None,
+            range=y_range,
         )
         fig.update_xaxes(
             title_text=f"Experimental values [{units[i] if units else ''}]",
             row=i + 1,
             col=1,
-            range=[x.min() - 0.1 * x.std(), x.max() + 0.1 * x.std()] if super_marker else None,
+            range=x_range,
         )
 
     fig.update_layout(

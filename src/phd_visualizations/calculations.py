@@ -1,6 +1,6 @@
 from enum import Enum
 import numpy as np
-from typing import Literal
+from typing import Literal, Callable
 
 MetricNames = Literal["rmse", "mape", "mae", "r2", "nrmse_mean", "nrmse_range"]
 MetricsDict: dict[str, dict[str, str]] = {
@@ -138,37 +138,47 @@ def calculate_uncertainty(value: float, instrument: SupportedInstruments | str) 
 #
 #     return meas_uncertainty
 
-
+def _filter_nan(y_true: np.ndarray, y_pred: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    mask = ~np.isnan(y_true) & ~np.isnan(y_pred)
+    return y_true[mask], y_pred[mask]
 
 def calculate_r2(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    return 1 - np.sum((y_true - y_pred) ** 2) / np.sum((y_true - np.mean(y_true)) ** 2)
+    y_true, y_pred = _filter_nan(y_true, y_pred)
+    ss_res = np.sum((y_true - y_pred) ** 2)
+    ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
+    return 1 - ss_res / ss_tot if ss_tot != 0 else np.nan
 
 def calculate_rmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    return np.sqrt(((y_true - y_pred) ** 2).mean())
+    y_true, y_pred = _filter_nan(y_true, y_pred)
+    return np.sqrt(np.mean((y_true - y_pred) ** 2))
 
 def calculate_mae(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    y_true, y_pred = _filter_nan(y_true, y_pred)
     return np.mean(np.abs(y_true - y_pred))
 
 def calculate_mape(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    return np.mean(100 * np.abs(y_true - y_pred) / y_true)
+    y_true, y_pred = _filter_nan(y_true, y_pred)
+    nonzero_mask = y_true != 0
+    y_true, y_pred = y_true[nonzero_mask], y_pred[nonzero_mask]
+    return np.mean(100 * np.abs(y_true - y_pred) / y_true) if len(y_true) > 0 else np.nan
 
 def calculate_nrmse_mean(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    """Normalized RMSE by mean of y_true."""
-    rmse = calculate_rmse(y_true, y_pred)
-    return rmse / np.mean(y_true)
+    y_true, y_pred = _filter_nan(y_true, y_pred)
+    mean_true = np.mean(y_true)
+    return calculate_rmse(y_true, y_pred) / mean_true if mean_true != 0 else np.nan
 
 def calculate_nrmse_range(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    """Normalized RMSE by range of y_true."""
-    rmse = calculate_rmse(y_true, y_pred)
-    return rmse / (np.max(y_true) - np.min(y_true))
+    y_true, y_pred = _filter_nan(y_true, y_pred)
+    range_true = np.max(y_true) - np.min(y_true)
+    return calculate_rmse(y_true, y_pred) / range_true if range_true != 0 else np.nan
 
 def calculate_metrics(
     y_true: np.ndarray,
     y_pred: np.ndarray,
-    metrics: list[MetricNames]
+    metrics: list[str]
 ) -> dict[str, float]:
-    
-    available_metrics: dict[str, callable] = {
+
+    available_metrics: dict[str, Callable[[np.ndarray, np.ndarray], float]] = {
         "r2": calculate_r2,
         "rmse": calculate_rmse,
         "mae": calculate_mae,

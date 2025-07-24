@@ -209,3 +209,14 @@ def find_n_best_values_in_list(source_list: list[list[float]], n: int, objective
 
     logger.info(f"{best_fitness_list=} at {best_idxs=}")
     return best_idxs, best_fitness_list
+
+
+def compute_axis_range(data, padding_ratio=0.1):
+    data = np.asarray(data)
+    data = data[~np.isnan(data)]  # Remove NaNs
+    if data.size == 0:
+        return None  # or a default range like [0, 1]
+    data_min, data_max = np.min(data), np.max(data)
+    span = data_max - data_min
+    padding = span * padding_ratio if span > 0 else 1.0  # avoid zero span
+    return [data_min - padding, data_max + padding]
