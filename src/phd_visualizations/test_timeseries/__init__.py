@@ -96,6 +96,7 @@ def add_trace(
 
         else:
             # Plot legend
+            assert legend_id in legends_dict["plots"], f'legend_id {legend_id} not found in plot_config->legends. If showlegend is True for any trace, it should be also set in the plot configuration'
             legend = legends_dict["plots"][legend_id]["plotly_id"]  # Should always be found
 
     name = trace_conf.get('name', None)
@@ -621,17 +622,20 @@ def experimental_results_plot(
         
         # If xminor is set to True in the figure configuration, unless it is explicitly set to False in the plot configuration
         xminor = plt_config.get("xminor", False) and conf.get("xminor", True)
+        showticklabels = True if (row_idx == rows - 1 or conf.get("independent_xaxis", False)) else False
+        tick_color = "rgba(0,0,0,0)" if not showticklabels else "#333333"
         
         xaxes_settings[f'xaxis{axes_idx}'] = dict(
             anchor=f'y{axes_idx}', 
             matches='x' if idx > 1 and not conf.get("independent_xaxis", False) else None,
-            showticklabels=True if row_idx == rows - 1 or conf.get("independent_xaxis", False) else False,
-            tickcolor="rgba(0,0,0,0)" if row_idx != rows - 1 else None,
+            showticklabels=showticklabels,
+            tickcolor=tick_color,
             title_text=conf.get("xaxis_title_text", None),
             title_standoff=conf.get("xaxis_title_standoff", None),
             minor={"showgrid": xminor},
         )  # title= idx,
-        # print(f"{xaxes_settings=}")
+        
+        # print(f'{plot_id=}, {xaxes_settings[f"xaxis{axes_idx}"]=} | {showticklabels=}')
         
         title = conf.get('ylabels_left', [None])[0]  # Only one axis is supported anyway
 
@@ -773,11 +777,14 @@ def experimental_results_plot(
 
             ### Configure axis so that it's plotted between the current axes and the next one
             yaxes_settings[f'yaxis{aux_idx}'] = {
-                'domain': (domains[row_idx + 1][-1], domains[row_idx][0] - vertical_spacing / 1.5),
+                'domain': (domains[row_idx + 1][-1]+0.005, domains[row_idx][0] - conf.get("active_plot_domain_shift", vertical_spacing / 1.5)),
                 'anchor': f'x{aux_idx}', 'showgrid': False, 'showticklabels': False,
                 'showline': False, 'zeroline': False, 'showspikes': False,
                 'fixedrange': True, 'tickcolor': "rgba(0,0,0,0)"
             }
+            
+            # print(f"{yaxes_settings[f'yaxis{aux_idx}']['domain']=}, {domains[row_idx + 1][-1]=}, {domains[row_idx][0]=}")
+            
             xaxes_settings[f'xaxis{aux_idx}'] = {
                 'anchor': f'y{aux_idx}', 'matches': 'x', 'showticklabels': False,
                 'showgrid': False, 'showline': False, 'zeroline': False,
@@ -824,6 +831,9 @@ def experimental_results_plot(
             )
         
         for trace_conf in conf['traces_left']:
+            
+            if not isinstance(trace_conf, dict) and isinstance(trace_conf[0], Iterable):
+                raise ValueError(f"Only one left y axis is supported, provided {len(trace_conf)} traces in {plot_id}.")
             
             ylims_left = conf.get('ylims_left', None)
 
@@ -929,7 +939,7 @@ def experimental_results_plot(
             yaxes_settings[f'yaxis{axes_idx}']['range'] = [min_y - padding_min, max_y + padding_max]
 
         elif isinstance(ylims_left, list):
-            yaxes_settings[f'yaxis{axes_idx}']['range'] = [conf['ylims_left'][0], conf['ylims_left'][1]]
+            yaxes_settings[f'yaxis{axes_idx}']['range'] = [ylims_left[0], ylims_left[1]]
 
         # logger.debug(f'Left axis range: {yaxes_settings[f"yaxis{axes_idx}"]["range"]}')
 
@@ -995,8 +1005,8 @@ def experimental_results_plot(
                         legend_yaxis_indicator=legend_yaxis_indicator
                     )
 
-                # if isinstance(conf.get('ylims_right', None), list):
-                #     yaxes_settings[f'yaxis{idx}']['range'] = [conf['ylims_right'][0], conf['ylims_right'][1]]
+                if isinstance(conf.get('ylims_right', None), list):
+                    yaxes_settings[f'yaxis{idx}']['range'] = [conf['ylims_right'][0], conf['ylims_right'][1]]
 
                 # Add index for each right axis added
                 idx += 1
@@ -1033,7 +1043,7 @@ def experimental_results_plot(
         newshape=newshape_style,
         hovermode='x unified',
         hoverlabel=dict(
-            bgcolor="rgba(0,0,0,0)",
+            bgcolor=plt_config.get("hoverlabel_bgcolor", "rgba(255,255,255,0.8)"),
             font_size=12,
             bordercolor="rgba(0,0,0,0)"
             # font_family="Rockwell"
