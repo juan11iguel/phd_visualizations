@@ -429,7 +429,7 @@ def experimental_results_plot(
 
     if df_comp is not None and not isinstance(df_comp, list):
         df_comp = [df_comp]
-    if comp_trace_labels is not None:
+    if df_comp is not None and comp_trace_labels is not None:
         assert len(df_comp) == len(comp_trace_labels), \
             f'comp_trace_labels must be the same length as df_comp, got {len(df_comp)} and {len(comp_trace_labels)}'
         
