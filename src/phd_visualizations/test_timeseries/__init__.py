@@ -266,6 +266,7 @@ def add_trace(
                         # **trace_conf.get("kwargs", {}),
                         stackgroup=stackgroup_comp,
                         fillcolor="rgba(0,0,0,0)",
+                        connectgaps=False,
                     ),
                     **plotly_resample_kwargs_comp
                 )
@@ -951,10 +952,17 @@ def experimental_results_plot(
                 axis_right_configs = [traces_right]  # Single right yaxis
             else:
                 axis_right_configs = traces_right  # Multiple right yaxis
+            
+            ylims = conf.get('ylims_right', [None] * len(axis_right_configs))
+            if not isinstance(ylims, list) or isinstance(ylims[0], float | int):
+                ylims = [ylims]
 
+            assert len(ylims) == len(axis_right_configs), \
+                f'{plot_id}: ylims_right must be the same length as the number of right yaxis, got {len(ylims)} and {len(axis_right_configs)}'
+            
             for pos_idx, traces_config in enumerate(axis_right_configs):
                 titles = conf.get('ylabels_right', [None] * len(traces_config))
-
+                
                 yaxes_settings[f'yaxis{idx}'] = dict(
                     overlaying=overlaying_axis, 
                     side='right', 
@@ -966,6 +974,9 @@ def experimental_results_plot(
                 )
 
                 for trace_idx, trace_conf in enumerate(traces_config):
+                    # TODO: Here we should support the same options as for the left traces
+                    if isinstance(ylims[pos_idx], list):
+                        yaxes_settings[f'yaxis{idx}']['range'] = [ylims[pos_idx][0], ylims[pos_idx][1]]
 
                     if trace_conf['var_id'].endswith('*'):
                         raise NotImplementedError(
@@ -1005,8 +1016,6 @@ def experimental_results_plot(
                         legend_yaxis_indicator=legend_yaxis_indicator
                     )
 
-                if isinstance(conf.get('ylims_right', None), list):
-                    yaxes_settings[f'yaxis{idx}']['range'] = [conf['ylims_right'][0], conf['ylims_right'][1]]
 
                 # Add index for each right axis added
                 idx += 1
