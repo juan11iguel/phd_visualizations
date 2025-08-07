@@ -64,7 +64,7 @@ def add_super_scatter_trace(
     num_points = 100 # Number of points to generate for the arc path
     
     # Calculate y-axis range to normalize marker sizes
-    y_range = max(y) - min(y)
+    y_range = np.nanmax(y) - np.nanmin(y)
     
     # Convert normalized marker_size_range to actual radius values based on y-axis range
     actual_marker_size_range = (mp.marker_size_range[0] * y_range, mp.marker_size_range[1] * y_range)
@@ -75,6 +75,7 @@ def add_super_scatter_trace(
 
     # In the caller function, if not explicitly set, just take the column name in the dataframe
 
+    legend_added_flag = False
     for idx in range(len(x)):
         
         if np.isnan(x[idx]) or np.isnan(y[idx]):
@@ -108,8 +109,8 @@ def add_super_scatter_trace(
                 fillcolor=mp.ring_colors[0],
                 # layer="between",
                 line=dict(width=0),  # Disable the line
-                showlegend=True if (idx == 0 and showlegend) else False,  # Show legend only for the first donut
-                name=ring_labels[0] if idx == 0 else "",
+                showlegend=True if (not legend_added_flag and showlegend) else False,  # Show legend only for the first donut
+                name=ring_labels[0] if not legend_added_flag else "",
                 xref=f"x{xref}",
                 yref=f"y{yref}",
             )
@@ -121,8 +122,8 @@ def add_super_scatter_trace(
                 path=path,
                 fillcolor=mp.ring_colors[1],
                 line=dict(width=0),  # Disable the line
-                showlegend=True if (idx == 0 and showlegend) else False,  # Show legend only for the first donut
-                name=ring_labels[1] if idx == 0 else "",
+                showlegend=True if (not legend_added_flag and showlegend) else False,  # Show legend only for the first donut
+                name=ring_labels[1] if not legend_added_flag else "",
                 xref=f"x{xref}",
                 yref=f"y{yref}",
             )
@@ -157,12 +158,14 @@ def add_super_scatter_trace(
             fillcolor="rgba(0, 0, 0, 0)",  # Transparent
             line_color=color_palette["bg_gray"],
             line=dict(dash='dot'),
-            showlegend=True if (idx == 0 and showlegend) else False,  # Show legend only for the first donut
-            name=size_label if idx == 0 else "",
+            showlegend=True if (not legend_added_flag and showlegend) else False,  # Show legend only for the first donut
+            name=size_label if not legend_added_flag else "",
             xref=f"x{xref}",
             yref=f"y{yref}",
         )
         
+        legend_added_flag = True  # Only add legend for the first donut
+                
     # Add an invisible scatter trace to retain the hover info
     fig.add_trace(
         go.Scatter(
