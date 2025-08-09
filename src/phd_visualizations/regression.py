@@ -230,6 +230,7 @@ def regression_plot(
                     xref=f"{i+1 if i > 0 else ''}",
                     yref=f"{i+1 if i > 0 else ''}",
                     showlegend=True if i== 0 else False,
+                    show_markers_index=super_marker.show_markers_index,
                 )
 
         # Perfect fit line

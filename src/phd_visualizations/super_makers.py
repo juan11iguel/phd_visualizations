@@ -21,6 +21,7 @@ class SuperMarker:
     ring_labels: Optional[tuple[str, str]] = None
     fill_label: Optional[str] = None
     size_label: Optional[str] = None
+    show_markers_index: bool = False
     params: MarkerParams = field(default_factory=MarkerParams)
 
 def lerp_color(c1, c2, t):
@@ -48,7 +49,8 @@ def add_super_scatter_trace(
     xref: str = "",
     yref: str = "",
     showlegend: bool = True,
-
+    show_markers_index: bool = False,
+    
     # Parameters
     marker_params: MarkerParams = MarkerParams(),
 ):
@@ -76,10 +78,14 @@ def add_super_scatter_trace(
     # In the caller function, if not explicitly set, just take the column name in the dataframe
 
     legend_added_flag = False
+    added_idxs = []
     for idx in range(len(x)):
         
         if np.isnan(x[idx]) or np.isnan(y[idx]):
+            added_idxs.append(None)
             continue
+        
+        added_idxs.append(idx)
         
         cx, cy = x[idx], y[idx]  # Center
 
@@ -90,6 +96,8 @@ def add_super_scatter_trace(
             # Map Qc[0] from [Qc_min, Qc_max] to [min_size, max_size] for r_inner
             # r_outer is 10% of marker_size_range[0] larger than r_inner
             r_outer = r_inner + mp.ring_width * actual_marker_size_range[0]
+
+            # Calculate the arc span for the first ring varibale
             theta_start = 0    # Starting angle of partial arc (in degrees)
             theta_end = ring_vars_vals[0][idx] / np.sum([ring_var_val[idx] for ring_var_val in ring_vars_vals]) * 360    # Ending angle of partial arc
 
@@ -100,30 +108,30 @@ def add_super_scatter_trace(
             path = f"M{x_arc[0]},{y_arc[0]}" + ''.join([f"L{x},{y}" for x, y in zip(x_arc[1:], y_arc[1:])])
             path += f"L{cx},{cy}Z"  # Close the path back to the center
 
-            # Add full outer circle (base)
+            # Add full outer circle i.e. second variable! (base)
             fig.add_shape(
                 layer="between",
                 type="circle",
                 x0=cx - r_outer, y0=cy - r_outer,
                 x1=cx + r_outer, y1=cy + r_outer,
-                fillcolor=mp.ring_colors[0],
+                fillcolor=mp.ring_colors[1],
                 # layer="between",
                 line=dict(width=0),  # Disable the line
                 showlegend=True if (not legend_added_flag and showlegend) else False,  # Show legend only for the first donut
-                name=ring_labels[0] if not legend_added_flag else "",
+                name=ring_labels[1] if not legend_added_flag else "",
                 xref=f"x{xref}",
                 yref=f"y{yref}",
             )
 
-            # Add partial arc segment (on top of base)
+            # Add the calculated partial arc segment corresponding to the first ring variable  (on top of base)
             fig.add_shape(
                 layer="between",
                 type="path",
                 path=path,
-                fillcolor=mp.ring_colors[1],
+                fillcolor=mp.ring_colors[0],
                 line=dict(width=0),  # Disable the line
                 showlegend=True if (not legend_added_flag and showlegend) else False,  # Show legend only for the first donut
-                name=ring_labels[1] if not legend_added_flag else "",
+                name=ring_labels[0] if not legend_added_flag else "",
                 xref=f"x{xref}",
                 yref=f"y{yref}",
             )
@@ -166,13 +174,22 @@ def add_super_scatter_trace(
         
         legend_added_flag = True  # Only add legend for the first donut
                 
-    # Add an invisible scatter trace to retain the hover info
+    # Add an additional scatter trace to retain the hover info and precise value-position
+    
+    marker_text_data = {}
+    if show_markers_index:
+        marker_text_data = dict(
+            text=added_idxs,
+            textposition="bottom right",
+            textfont=dict(size=9,),
+        ) 
+
     fig.add_trace(
         go.Scatter(
             x=x,
             y=y,
             name=trace_label,
-            mode="markers",
+            mode="text+markers" if show_markers_index else "markers",
             marker=dict(
                 size=5,  # Small size to avoid clutter
                 color="#333333",
@@ -180,6 +197,8 @@ def add_super_scatter_trace(
                 # opacity=1,
             ),
             showlegend=False,
+            **marker_text_data
+            
         ),
         row=row, col=col
     ) 
