@@ -146,7 +146,15 @@ def calculate_r2(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     y_true, y_pred = _filter_nan(y_true, y_pred)
     ss_res = np.sum((y_true - y_pred) ** 2)
     ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
-    return 1 - ss_res / ss_tot if ss_tot != 0 else np.nan
+    
+    if ss_tot != 0: 
+        r2 = 1 - ss_res / ss_tot
+        # Truncate to the second decimal: X.XX
+        r2 = np.floor(r2 * 100) / 100
+    else: 
+        r2 = np.nan
+    
+    return r2
 
 def calculate_rmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     y_true, y_pred = _filter_nan(y_true, y_pred)
