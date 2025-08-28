@@ -1,6 +1,7 @@
-from typing import Literal
+from typing import Literal, Optional
 from pathlib import Path
 import pandas as pd
+import copy
 from loguru import logger
 import numpy as np
 from plotly.colors import hex_to_rgb
@@ -220,3 +221,35 @@ def compute_axis_range(data, padding_ratio=0.1):
     span = data_max - data_min
     padding = span * padding_ratio if span > 0 else 1.0  # avoid zero span
     return [data_min - padding, data_max + padding]
+
+
+def update_plot_config(
+    plot_config: dict, 
+    show_titles: bool, 
+    show_left_axis_titles: bool,
+    show_right_axis_titles: bool, 
+    showlegends: bool,
+    show_main_title: bool = False,
+    width: Optional[int] = None,
+) -> dict:
+    pc = copy.deepcopy(plot_config)
+    
+    if not show_main_title:
+        pc["title"] = ""
+        pc["subtitle"] = ""
+    if width is not None:
+        pc["width"] = width
+    for plot in pc["plots"].values():
+        if not show_titles:
+            plot["title"] = ""
+        if not show_left_axis_titles:
+            plot["ylabels_left"] = ["" for _ in plot["ylabels_left"]]
+        if "ylabels_right" in plot and not show_right_axis_titles:
+                plot["ylabels_right"] = ["" for _ in plot["ylabels_right"]]
+        if not showlegends:
+            plot["showlegend"] = False
+            for trace in plot.get("traces_left", []):
+                trace["showlegend"] = False
+            for trace in plot.get("traces_right", []):
+                trace["showlegend"] = False
+    return pc
