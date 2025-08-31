@@ -19,7 +19,8 @@ from phd_visualizations.constants import (color_palette,
                                           default_fontsize,
                                           newshape_style,
                                           named_css_colors,
-                                          dash_types)
+                                          dash_types,
+                                          plt_colors)
 from phd_visualizations.calculations import calculate_uncertainty
 from phd_visualizations.utils import (tuple_to_string, 
                                       ColorChooser, 
@@ -77,7 +78,11 @@ def add_trace(
     if trace_color is not None:
         color = color_palette[trace_color] if trace_color in color_palette.keys() else trace_color
     else:
-        color = None
+        if df_comp is not None:
+            # A base color needs to be chosen, from which the comparison colors will be generated
+            color = plt_colors[ (yaxes_idx-1) % len(plt_colors) ]
+        else:
+            color = None
 
     # Set trace color with opacity if specified
     if color is not None and 'opacity' in trace_conf:
@@ -452,7 +457,8 @@ def experimental_results_plot(
     vertical_spacing = plt_config.get("vertical_spacing", 0.03)
     # reduced_vs = vertical_spacing / 3
     xdomain = plt_config.get("xdomain", [0, 0.85])
-    yaxis_right_pos = plt_config.get("yaxis_right_pos", [xdomain[-1]+0.01, xdomain[-1]+0.1])
+    yaxis_right_pos = plt_config.get("yaxis_right_pos", [np.min([1.0, xdomain[-1]+0.01]), 
+                                                         np.min([1.0, xdomain[-1]+0.1 ])])
     height = plt_config["height"]
     width = plt_config["width"]
     arrow_xrel_pos = plt_config.get("arrow_xrel_pos", 20)
@@ -550,7 +556,7 @@ def experimental_results_plot(
         # for req_field in req_field_ids:
         #     assert req_field in plt_config['plots'][id].keys(), f'{req_field} not found in plot configuration for plot {id}'
         legend_pos = plt_config['plots'][plot_id].get("legend_position", "side")
-        legend_xmargin = plt_config['plots'][plot_id].get("legend_xmargin", 0.05)
+        legend_xmargin = plt_config['plots'][plot_id].get("legend_xmargin", plt_config.get("legend_xmargin", 0.05))
         legend_delta_y = plt_config['plots'][plot_id].get("legend_delta_y", plt_config.get("legend_delta_y", 0.0))
         if legend_pos == "side":
             y = domains[row_idx][1] + legend_delta_y
@@ -1044,7 +1050,7 @@ def experimental_results_plot(
         # paper_bgcolor='rgba(0,0,0,0)',
         # title_text="Complex Plotly Figure Layout",
         # margin=dict(l=20, r=200, t=100, b=20, pad=5),
-        margin=plt_config.get("margin", dict(l=20, r=200, t=100, b=20, pad=5)),
+        margin=plt_config.get("margin", dict(l=20, r=20, t=100, b=20, pad=5)),
         **xaxes_settings,
         **yaxes_settings,
         **legends_layout,
