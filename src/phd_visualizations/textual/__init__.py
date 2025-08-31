@@ -203,6 +203,8 @@ def generate_latex_table(
                     submetric_groups[(metric_id, submetric_id)] = groups
         
         return submetric_groups
+    
+    assert len(regular_col_ids) == len(regular_col_labels), f"Length of regular_col_ids and regular_col_labels must match, got {len(regular_col_ids)=} and {len(regular_col_labels)=}"
 
     n_regular = len(regular_col_ids)
     n_metrics = len(metric_info)
