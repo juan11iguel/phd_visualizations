@@ -26,10 +26,11 @@ def regression_plot(
     show_error_metrics: Optional[list[MetricNames]] = None,
     inline_error_metrics_text: bool = False,
     var_labels: list[str] = None,
-    legend_pos: Optional[Literal["side", "top", "top_spaced"]] = None,
+    legend_pos: Literal["side", "top", "top_spaced"] = "side",
     super_marker: Optional[SuperMarker] = None,
     title_margin: int = 100,
     vertical_spacing: float = .1,
+    figure_layout: Literal["horizontal", "vertical", "square"] = "vertical",
     reference_error_lines: list[float] = None,
     df_ref_bg: Optional[pd.DataFrame] = None,
     df_mod_bg: Optional[pd.DataFrame] = None,
@@ -96,6 +97,12 @@ def regression_plot(
     if var_labels is None:
         var_labels = var_ids
         
+    assert len(var_ids) == len(var_labels) == len(units) == len(instruments), "var_ids, var_labels, units, and instruments must have the same length."
+    if alternative_labels is not None:
+        assert len(alternative_labels) == len(df_mod), "If provided, alternative_labels must have the same length as df_mod."
+    if figure_layout not in ["horizontal", "vertical", "square"]:
+        raise ValueError("figure_layout must be either 'horizontal', 'vertical', or 'square'")
+        
     # width = kwargs.get("width", 600)
     v_spacing = kwargs.get("v_spacing", 0.08)
     n_rows = len(var_ids)
@@ -107,6 +114,7 @@ def regression_plot(
     kwargs.setdefault('template', 'plotly_white')
     kwargs.setdefault('hoverlabel_namelength', -1) # Show full variable names in hover
     kwargs.setdefault('showlegend', True)
+    kwargs.setdefault('title_y', 0.99)
     kwargs.setdefault('title_text', "Model validation")
     kwargs.setdefault('font', dict(size=default_fontsize))
     kwargs.setdefault('hovermode', 'x unified')
@@ -196,9 +204,20 @@ def regression_plot(
     else:
         subplot_titles = [f"<b>{var_label}</b>" for var_label in var_labels]
         
+    # Compute rows and cols based on figure_layout
+    if figure_layout == "horizontal":
+        cols = len(var_ids)
+        rows = 1
+    elif figure_layout == "vertical":
+        cols = 1
+        rows = len(var_ids)
+    elif figure_layout == "square":
+        cols = int(np.ceil(np.sqrt(len(var_ids))))
+        rows = int(np.ceil(len(var_ids) / cols))
+        
     fig = make_subplots(
-        rows=len(var_ids),
-        cols=1,
+        rows=rows,
+        cols=cols,
         subplot_titles=subplot_titles,
         vertical_spacing=vertical_spacing,
         # column_widths=[width] * len(var_ids),
@@ -206,6 +225,9 @@ def regression_plot(
     )
 
     for i, var_id in enumerate(var_ids):
+        rows_i = i // cols + 1
+        cols_i = i % cols + 1
+        
         x = df_ref[var_id].values
         
         # Sort by increasing x values and get the sorted indices
@@ -243,8 +265,8 @@ def regression_plot(
             name='Sensor uncertainty',
         )
         
-        fig.add_trace(upper_bound, row=i + 1, col=1)
-        fig.add_trace(lower_bound, row=i + 1, col=1)
+        fig.add_trace(upper_bound, row=rows_i, col=cols_i)
+        fig.add_trace(lower_bound, row=rows_i, col=cols_i)
 
         # Reference error lines
         if reference_error_lines is not None:
@@ -269,7 +291,7 @@ def regression_plot(
                         textposition='top center',
                         textfont=dict(size=10, color=color_palette["bg_gray"]),
                     ), 
-                    row=i + 1, col=1
+                    row=rows_i, col=cols_i
                 )
                 fig.add_trace(
                     go.Scatter(
@@ -281,7 +303,7 @@ def regression_plot(
                         line=dict(color=color_palette["bg_gray"], width=1, dash='dash'),
                         hoverinfo='skip',
                     ), 
-                    row=i + 1, col=1
+                    row=rows_i, col=cols_i
                 )
                 
         # Add background data if provided
@@ -302,7 +324,7 @@ def regression_plot(
                     ),
                     legendgroup="background",
                 ), 
-                row=i + 1, col=1
+                row=rows_i, col=cols_i
             )
                 
         # Perfect fit line
@@ -315,7 +337,7 @@ def regression_plot(
                 showlegend=(i == 0),
                 line=dict(color=color_palette["dark_gray"], width=2),
             ), 
-            row=i + 1, col=1
+            row=rows_i, col=cols_i
         )
         
         
@@ -338,7 +360,7 @@ def regression_plot(
                     ),
                     legendgroup=f"model{j}",
                 )
-                fig.add_trace(scatter, row=i + 1, col=1)
+                fig.add_trace(scatter, row=rows_i, col=cols_i)
             else:
                 fig = add_super_scatter_trace(
                     fig,
@@ -362,6 +384,16 @@ def regression_plot(
                     show_markers_index=super_marker.show_markers_index,
                 )
 
+        # Perfect fit line
+        regression_line = go.Scatter(
+            x=x,
+            y=x,
+            mode='lines',
+            name='Perfect fit',
+            showlegend=(i == 0),
+            line=dict(color=color_palette["dark_gray"], width=2),
+        )
+        fig.add_trace(regression_line, row=rows_i, col=cols_i)
         
         y_range = compute_axis_range(x) if super_marker else None
         x_range = compute_axis_range(x) if super_marker else None
