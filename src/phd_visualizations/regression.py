@@ -383,17 +383,6 @@ def regression_plot(
                     showlegend=True if i== 0 else False,
                     show_markers_index=super_marker.show_markers_index,
                 )
-
-        # Perfect fit line
-        regression_line = go.Scatter(
-            x=x,
-            y=x,
-            mode='lines',
-            name='Perfect fit',
-            showlegend=(i == 0),
-            line=dict(color=color_palette["dark_gray"], width=2),
-        )
-        fig.add_trace(regression_line, row=rows_i, col=cols_i)
         
         y_range = compute_axis_range(x) if super_marker else None
         x_range = compute_axis_range(x) if super_marker else None
