@@ -661,6 +661,7 @@ def experimental_results_plot(
             'showgrid': True,
             "autorange": False,
             "nticks": conf.get("ynticks_left", None),
+            "showticklabels": conf.get("show_left_axis", True),
         }
 
         # Plot configuration
@@ -977,6 +978,7 @@ def experimental_results_plot(
                     position=yaxis_right_pos[pos_idx],
                     title=titles[pos_idx],
                     nticks=conf.get("ynticks_right", None),
+                    showticklabels=conf.get("show_right_axis", True),
                 )
 
                 for trace_idx, trace_conf in enumerate(traces_config):

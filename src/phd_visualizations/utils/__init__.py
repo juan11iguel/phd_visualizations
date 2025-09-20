@@ -1,5 +1,6 @@
 from typing import Literal, Optional
 from pathlib import Path
+import warnings
 import pandas as pd
 import copy
 from loguru import logger
@@ -234,6 +235,9 @@ def update_plot_config(
     show_main_title: bool = False,
     width: Optional[int] = None,
 ) -> dict:
+    
+    warnings.warn("This function is deprecated. Use the equivalent one from test_timeseries.utils", DeprecationWarning)
+    
     pc = copy.deepcopy(plot_config)
     
     if not show_main_title:
