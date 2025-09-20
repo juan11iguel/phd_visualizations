@@ -19,6 +19,8 @@ def update_plot_config(
     if not show_main_title:
         pc["title"] = ""
         pc["subtitle"] = ""
+        pc["margin"]["t"] = 30  # reduce top margin if no title
+        
     if width is not None:
         pc["width"] = width
     for plot in pc["plots"].values():
