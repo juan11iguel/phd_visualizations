@@ -161,7 +161,8 @@ def stack_images_vertically(image_path_top: Path, image_path_bottom: Path, outpu
     new_image.paste(bottom_image, (0, top_image.height))
     
     # Save or display the new image
-    new_image.save(output_path, )
+    new_image.save(output_path)
+    logger.info(f"Stacked image saved to {output_path}")
     # new_image.show()  # Uncomment to display the image
     
 def stack_images_horizontally(image_paths: list[Path], output_path: Path) -> None:
@@ -183,6 +184,7 @@ def stack_images_horizontally(image_paths: list[Path], output_path: Path) -> Non
     
     # Save the new image
     new_image.save(output_path)
+    logger.info(f"Stacked image saved to {output_path}")
     
 def find_n_best_values_in_list(source_list: list[list[float]], n: int, objective: Literal["minimize", "maximize"] = "minimize") -> tuple[list[int], list[float]]:
 
