@@ -251,5 +251,9 @@ def update_plot_config(
             for trace in plot.get("traces_left", []):
                 trace["showlegend"] = False
             for trace in plot.get("traces_right", []):
-                trace["showlegend"] = False
+                if isinstance(trace, list):
+                    for t in trace:
+                        t["showlegend"] = False
+                else:
+                    trace["showlegend"] = False
     return pc
