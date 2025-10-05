@@ -1036,6 +1036,9 @@ def experimental_results_plot(
         legends_layout[lg_values["plotly_id"]] = {
             name: value for name, value in lg_values.items() if name not in keys_to_skip
         }
+        legends_layout[lg_values["plotly_id"]]["font_size"] = plt_config.get("legend_fontsize", 11)
+        
+    # print(f"{legends_layout=}")
 
     if title_text is None:
         # Get from plot configuration
@@ -1067,6 +1070,7 @@ def experimental_results_plot(
         ),
         plot_bgcolor='rgba(0,0,0,0)' if template == "custom" else None,
         template=template if template != "custom" else "plotly",  # Use custom template if specified
+        font=dict(size=plt_config.get("font_size", 12), color="#333333"),
     )
     
     # Update xaxis settings
