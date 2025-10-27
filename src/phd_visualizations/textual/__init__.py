@@ -10,6 +10,7 @@ def generate_latex_table(
     submetric_labels: Optional[list[str]] = None,
     group_submetric_ids: Optional[list[str]] = None,
     numbers_precision: int = 2,
+    col_separators: list[int] | None = None,
 ) -> str:
     """
     Generate a LaTeX table string with multirow/multicolumn headers for metrics and submetrics.
@@ -23,6 +24,8 @@ def generate_latex_table(
         group_row_ids: List of column IDs to group with multirow when consecutive rows have same values (optional)
         submetric_labels: List of LaTeX-formatted labels for submetrics (optional)
         group_submetric_ids: List of submetric IDs to group with multirow when consecutive rows have same values (optional)
+        numbers_precision: Number of decimal places for float formatting (default: 2)
+        col_separators: List of indices of regular columns after which to add horizontal separator lines (optional)
 
     Returns:
         LaTeX table string
@@ -210,6 +213,18 @@ def generate_latex_table(
     n_metrics = len(metric_info)
     n_submetrics = len(submetric_ids)
     metric_keys = list(metric_info.keys())
+    
+    if submetric_labels is None:
+        submetric_labels = []
+    if group_submetric_ids is None:
+        group_submetric_ids = []
+      
+    if col_separators is not None:
+        col_separators.sort()
+        if max(col_separators) >= n_regular:
+            raise ValueError(f"Column separator line index is greater than number of columns: {col_separators=} > {n_regular=}")
+    else:
+        col_separators = []
 
     # Build column format string
     col_format = ""
@@ -372,6 +387,8 @@ def generate_latex_table(
     
     data_rows = []
     for row_idx, row in enumerate(data):
+        group_size_sep  = [-1] * len(col_separators)
+        group_start_sep = [0] * len(col_separators)
         row_cells = []
         
         # Add regular columns with spacing
@@ -388,6 +405,9 @@ def generate_latex_table(
                 row_idx in column_row_to_group[col]):
                 
                 group_start, group_size = column_row_to_group[col][row_idx]
+                if i in col_separators:
+                    group_start_sep[col_separators.index(i)] = group_start
+                    group_size_sep[col_separators.index(i)] = group_size
                 
                 if row_idx == group_start and group_size > 1:
                     # First row of a group - use multirow
@@ -457,6 +477,21 @@ def generate_latex_table(
                         row_cells.append("")
         
         data_rows.append(" & ".join(row_cells) + " \\\\")
+        
+        
+        for col_i, col_separator in enumerate(col_separators):
+            # print(f"{row_idx=}")
+            # print(f"{group_start_sep[col_i]+group_size_sep[col_i]=}")
+            # print(f"{(row_idx+1) == (group_start+group_size)=}")
+            if ((row_idx+1) == (group_start_sep[col_i]+group_size_sep[col_i]) 
+                and row_idx+1 < len(data) # skip bottom line
+                ): 
+                
+                separator_str = f"\cline{{{regular_positions[col_separator]}-{metric_positions[-1]}}}"
+                
+                # Only add if not already added a line
+                if not data_rows[-1].startswith("\cline"):
+                    data_rows.append(separator_str)
 
     # Combine all
     latex = []
