@@ -168,7 +168,7 @@ def add_trace(
             **plotly_resample_kwargs
         )
 
-    # Add comparison trace(s)
+    # Configure comparison trace(s)
     customdata = None
     if df_comp is not None:
         # N_comp = len(df_comp)
@@ -226,58 +226,19 @@ def add_trace(
             customdata.append(data_comp)
         # customdata = [df_comp_.get(trace_conf['var_id'], None) for df_comp_ in df_comp]
 
+
+    # Hover template setup
     hovertemplate = "%{y:.2f}"
+    # Add comparison traces to hover text
     if customdata is not None and not all(element is None for element in customdata):
         customdata = np.stack(customdata, axis=-1)
         
         # hovertemplate = "%{y:.2f} (<span style='color:gray'> %{customdata:.2f} </span>)"
         hovertemplate = "%{y:.2f} "
         for i in range(customdata.shape[1]):
-            comp_name = f"{name} comp. {i}" if comp_labels is None else f"{name} {comp_labels[i]}"
             comp = customdata[:, i]
             if comp is not None:
-
-                plotly_resample_kwargs_comp = {'hf_x': df.index, 'hf_y': comp} if resample else {}
-
                 hovertemplate += f"(<span style='color:{color_comp_list[i]}'> %{{customdata[{i}]:.2f}} </span>) "
-
-                # if (i > 0 and color is None) or N_comp > 1:
-                #     color_comp = named_css_colors[i]
-                # else:
-                #     color_comp = color
-                    
-                stackgroup_comp = kwargs.get('stackgroup', None)
-                if stackgroup_comp is not None:
-                    stackgroup_comp = f"{stackgroup_comp}_comp_{i}"
-
-                # if trace_conf['var_id'] in df_comp[i].columns:
-                fig.add_trace(
-                    go.Scatter(
-                        x=df.index if not resample else None,
-                        y=comp if not resample else None,
-                        name=comp_name,
-                        mode='lines',
-                        line=dict(
-                            color=color_comp_list[i],
-                            dash= dash_comp_list[i],
-                            width=2
-                        ),
-                        showlegend=showlegend,
-                        legend=legend,
-                        xaxis=f'x{xaxes_idx}',
-                        yaxis=f'y{yaxes_idx}',
-                        # Hide tooltip
-                        hoverinfo='skip',
-                        # **trace_conf.get("kwargs", {}),
-                        stackgroup=stackgroup_comp,
-                        fillcolor="rgba(0,0,0,0)",
-                        connectgaps=False,
-                    ),
-                    **plotly_resample_kwargs_comp
-                )
-            else:
-                logger.debug(
-                    f'Cant add comparison trace for {trace_conf["var_id"]} since it does not exist in df_comp[{i}]')        
 
     # Configure fill_between
     if trace_conf.get('fill_between', False):
@@ -370,6 +331,53 @@ def add_trace(
                 hoverinfo='skip'
             )
         )
+        
+    # Add comparison trace(s) (at the end so they appear below in the legend)
+    if customdata is not None and not all(element is None for element in customdata):
+        
+        for i in range(customdata.shape[1]):
+            if comp_labels is None:
+                comp_name = f"{name} comp. {i}"  
+            else:
+                comp_name = f"{comp_labels[i]}" # More compact
+                # comp_name = f"{name} {comp_labels[i]}"
+            comp = customdata[:, i]
+            
+            if comp is None:
+                logger.debug(
+                    f'Cant add comparison trace for {trace_conf["var_id"]} since it does not exist in df_comp[{i}]')        
+            else:
+                plotly_resample_kwargs_comp = {'hf_x': df.index, 'hf_y': comp} if resample else {}
+                    
+                stackgroup_comp = kwargs.get('stackgroup', None)
+                if stackgroup_comp is not None:
+                    stackgroup_comp = f"{stackgroup_comp}_comp_{i}"
+
+                # if trace_conf['var_id'] in df_comp[i].columns:
+                fig.add_trace(
+                    go.Scatter(
+                        x=df.index if not resample else None,
+                        y=comp if not resample else None,
+                        name=comp_name,
+                        mode='lines',
+                        line=dict(
+                            color=color_comp_list[i],
+                            dash= dash_comp_list[i],
+                            width=2
+                        ),
+                        showlegend=showlegend,
+                        legend=legend,
+                        xaxis=f'x{xaxes_idx}',
+                        yaxis=f'y{yaxes_idx}',
+                        # Hide tooltip
+                        hoverinfo='skip',
+                        # **trace_conf.get("kwargs", {}),
+                        stackgroup=stackgroup_comp,
+                        fillcolor="rgba(0,0,0,0)",
+                        connectgaps=False,
+                    ),
+                    **plotly_resample_kwargs_comp
+                )
 
     # If comparison dataframe is given, add comparison trace
     # if customdata is not None:
